@@ -1,0 +1,34 @@
+---
+// The five steps, with the client's place marked in words as well as colour.
+interface Props {
+  steps: string[];
+  done: number;
+}
+const { steps, done } = Astro.props;
+const state = (i: number) => (i < done ? 'done' : i === done ? 'current' : 'todo');
+---
+
+<nav aria-label="Your progress" class="mx-auto mt-6 max-w-xl">
+  <ol class="flex gap-1.5">
+    {
+      steps.map((step, i) => (
+        <li class="min-w-0 flex-1" aria-current={state(i) === 'current' ? 'step' : undefined}>
+          <span
+            class:list={[
+              'block h-1.5 rounded-full',
+              state(i) === 'done' && 'bg-navy',
+              state(i) === 'current' && 'bg-signal',
+              state(i) === 'todo' && 'bg-slate-200',
+            ]}
+          />
+          <span class:list={['mt-2 block text-xs leading-tight font-semibold', state(i) === 'todo' ? 'text-slate-500' : 'text-navy']}>
+            <span class="sr-only">{`Step ${i + 1} of ${steps.length}: `}</span>
+            {step}
+            {state(i) === 'done' && <span aria-hidden="true"> ✓</span>}
+            <span class="sr-only">{state(i) === 'done' ? ' (done)' : state(i) === 'current' ? ' (you are here)' : ''}</span>
+          </span>
+        </li>
+      ))
+    }
+  </ol>
+</nav>

@@ -1,0 +1,26 @@
+{
+  "name": "build-mrkwp",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=24" },
+  "scripts": {
+    "dev": "wrangler types && astro dev",
+    "build": "wrangler types && astro check && astro build",
+    "preview": "astro preview",
+    "test": "node --test tests/",
+    "dev:test": "wrangler d1 migrations apply DB --local --env test && CLOUDFLARE_ENV=test astro dev",
+    "db:local": "wrangler d1 migrations apply DB --local"
+  },
+  "dependencies": {
+    "@astrojs/cloudflare": "^14.4.9",
+    "astro": "^7.4.13"
+  },
+  "devDependencies": {
+    "@astrojs/check": "latest",
+    "@tailwindcss/vite": "^4.3.3",
+    "tailwindcss": "^4.3.3",
+    "typescript": "latest",
+    "wrangler": "^4.168.0"
+  }
+}

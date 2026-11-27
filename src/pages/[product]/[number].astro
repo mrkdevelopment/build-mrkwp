@@ -1,0 +1,50 @@
+---
+// A job: /rebuild/RB-1042. With ?k=<code> it is the link from the email.
+import { env } from 'cloudflare:workers';
+import Heading from '../../components/Heading.astro';
+import Layout from '../../layouts/Layout.astro';
+import { openJob } from '../../lib/open-job.ts';
+import { STAGES, STEPS, UNKNOWN_STAGE } from '../../products/rebuild/stages.ts';
+import Welcome from '../../products/rebuild/Welcome.astro';
+
+const visit = await openJob(env, Astro.cookies, Astro.url, Astro.params);
+if (visit.show === 'redirect') return Astro.redirect(visit.to, 302);
+if (visit.show === 'wrong') Astro.response.status = 404;
+if (visit.show === 'busy') Astro.response.status = 503;
+
+const job = visit.show === 'job' ? visit.job : null;
+const screen = job ? (STAGES[job.stage] ?? UNKNOWN_STAGE) : null;
+---
+
+{
+  job && screen ? (
+    <Layout title={`Job ${job.number}`} jobNumber={job.number} progress={{ steps: STEPS, done: screen.done }}>
+      {screen.screen === 'welcome' ? (
+        <Welcome firstName={job.first_name} />
+      ) : (
+        <>
+          <Heading plain={screen.heading} payoff={screen.payoff} />
+          <p class="mt-5 text-lg leading-relaxed">{screen.text}</p>
+          <p class="mt-8 text-sm text-slate-600">
+            Your job number is <span class="font-mono font-semibold text-navy">{job.number}</span>. Quote it if you get in touch.
+          </p>
+        </>
+      )}
+    </Layout>
+  ) : visit.show === 'busy' ? (
+    <Layout title="Try again shortly">
+      <Heading plain="We can't open your job" payoff="just now." />
+      <p class="mt-5 text-lg leading-relaxed">Nothing is wrong with your link. Please wait a few minutes, then open it again.</p>
+    </Layout>
+  ) : (
+    <Layout title="This link isn't right">
+      <Heading plain="This link" payoff="isn't right." />
+      <p class="mt-5 text-lg leading-relaxed">
+        Open the link in the email we sent you, and use the whole link. If you copied it, a piece may be missing from the end.
+      </p>
+      <p class="mt-3 leading-relaxed">
+        Still stuck? <a class="font-semibold text-signal underline" href="https://www.mrkwp.com/contact/">Contact us</a> and we'll help.
+      </p>
+    </Layout>
+  )
+}

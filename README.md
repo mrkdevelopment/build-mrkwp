@@ -4,8 +4,9 @@ The source for **build.mrkwp.com**: the app a client uses after signing up for a
 website rebuild they tell us about their business, see what our checks found, view and rank five
 designs, choose extras, pay through Stripe, view their demo and approve it.
 
-Nothing is built yet. This repository holds the specification, the design system and the logo files,
-ready for the build to start. `docs/START-HERE.md` says what exists today and what to build first.
+The first phase is built and runs on a developer's computer: the emailed link signs a client in, shows
+the welcome screen, and confirms their job. It is not deployed yet. `docs/START-HERE.md` says what
+exists today, how to run it, and what comes next. `CHANGELOG.md` lists what each version added.
 
 ## What's here
 
@@ -27,9 +28,8 @@ ready for the build to start. `docs/START-HERE.md` says what exists today and wh
   Cloudflare so the client's screens never wait on WordPress.
 - **The MRK-Web skill**, run by Matt or Kate, makes the designs and the site.
 
-## Still needed before building
+## Still needed
 
-- Which Cloudflare account this project is created in.
 - A logo file of at least 512 px (an SVG is best). The app's home-screen icons need 192 and 512 px, and
   the only logo file so far is 128 px.
 - A service account and application password on mrkdevelopment.net, and the firewall user agent, typed

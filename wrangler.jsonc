@@ -1,0 +1,39 @@
+{
+  "name": "build-mrkwp",
+  // The "MRK WP" Cloudflare account, named by Matt on 27 Nov 2026.
+  "account_id": "f191aa872298dc8b110b75cb81406cab",
+  "main": "./src/worker.ts",
+  "compatibility_date": "2026-11-01",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "assets": { "binding": "ASSETS", "directory": "./dist" },
+  "observability": { "enabled": true },
+  // Not created on Cloudflare yet. The id below is a stand-in that only works locally;
+  // replace it with the real one when Matt says to create the database.
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "build-mrkwp",
+      "database_id": "00000000-0000-0000-0000-000000000000",
+      "migrations_dir": "migrations"
+    }
+  ],
+  // Private bucket for design pictures. Not created yet, and not used until the designs phase.
+  "r2_buckets": [{ "binding": "PICTURES", "bucket_name": "build-mrkwp-pictures" }],
+  // Sends anything waiting in the outbox, once a minute.
+  "triggers": { "crons": ["* * * * *"] },
+  // "test" is only ever run on this computer (npm run dev:test), against the stand-in backend in
+  // tests/fake-backend.mjs. It has its own local database so test jobs never mix with real ones.
+  "env": {
+    "test": {
+      "d1_databases": [
+        {
+          "binding": "DB",
+          "database_name": "build-mrkwp-test",
+          "database_id": "00000000-0000-0000-0000-000000000001",
+          "migrations_dir": "migrations"
+        }
+      ],
+      "r2_buckets": [{ "binding": "PICTURES", "bucket_name": "build-mrkwp-pictures-test" }]
+    }
+  }
+}

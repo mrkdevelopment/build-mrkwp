@@ -1,0 +1,57 @@
+@import "tailwindcss";
+
+/* Tokens and recipes from DESIGN.md (the www.mrkwp.com design system). */
+@theme {
+  --font-display: var(--font-space-grotesk);
+  --font-body: var(--font-outfit);
+  --color-signal: #2B59FF;
+  --color-signal-deep: #2047E0;
+  --color-navy: #0A2540;
+  --color-paper: #F8FAFC;
+  --color-teal-ink: #0F766E;
+}
+
+@layer base {
+  html {
+    font-family: var(--font-body);
+    color: #475569;
+    background-color: var(--color-paper);
+    -webkit-font-smoothing: antialiased;
+    -webkit-text-size-adjust: 100%;
+  }
+  h1, h2, h3 {
+    font-family: var(--font-display);
+    letter-spacing: -0.025em;
+    color: var(--color-navy);
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-signal);
+    outline-offset: 2px;
+  }
+}
+
+@utility btn-rise {
+  transition-property: translate, box-shadow, background-color, border-color, color, opacity;
+  transition-duration: 220ms;
+  transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  &:hover:not(:disabled), &:focus-visible {
+    translate: 0 -3px;
+    box-shadow: 0 14px 22px -10px var(--btn-rise-shadow, rgb(10 37 64 / 0.4)), 0 4px 8px -4px rgb(10 37 64 / 0.12);
+  }
+  &:active:not(:disabled) {
+    translate: 0 -1px;
+    box-shadow: 0 6px 12px -6px var(--btn-rise-shadow, rgb(10 37 64 / 0.4)), 0 2px 4px -2px rgb(10 37 64 / 0.1);
+    transition-duration: 90ms;
+  }
+  @media (prefers-reduced-motion: reduce) { &:hover, &:focus-visible, &:active { translate: none; } }
+}
+@utility btn-rise-blue { --btn-rise-shadow: rgb(43 89 255 / 0.55); }
+
+@utility btn-primary {
+  @apply btn-rise btn-rise-blue inline-flex items-center gap-2 rounded-xl bg-signal px-7 py-3.5 text-base font-bold text-white shadow-lg shadow-signal/25 hover:bg-signal-deep;
+  min-height: 3rem;
+}
+@utility btn-secondary {
+  @apply btn-rise inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-7 py-3.5 text-base font-semibold text-navy hover:border-signal/40;
+  min-height: 3rem;
+}

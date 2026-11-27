@@ -1,0 +1,6 @@
+# Made-up values for the stand-in backend (tests/fake-backend.mjs). Nothing here is real or secret.
+BUILD_API_URL=http://localhost:8799/build
+BUILD_API_USER=test
+BUILD_API_PASSWORD=test
+WP_USER_AGENT=build-mrkwp-test
+SESSION_SECRET=local-test-only

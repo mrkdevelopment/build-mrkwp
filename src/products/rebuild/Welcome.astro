@@ -1,0 +1,18 @@
+---
+// Stage `signed_up`. One thing to do: press Start, which confirms the job.
+import Heading from '../../components/Heading.astro';
+
+interface Props {
+  firstName: string;
+}
+const { firstName } = Astro.props;
+---
+
+<Heading plain={firstName ? `Thanks, ${firstName}.` : 'Thanks for signing up.'} payoff="Let's get to know your business." />
+<p class="mt-5 text-lg leading-relaxed">
+  A few questions about your business and a quick look at your current website. Then we make your five designs, free.
+</p>
+<p class="mt-3 leading-relaxed">It takes about five minutes, and you can stop and come back with the same link.</p>
+<form method="post" action="/api/job/confirm" class="mt-8">
+  <button type="submit" class="btn-primary">Start <span aria-hidden="true">→</span></button>
+</form>

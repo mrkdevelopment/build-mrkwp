@@ -8,16 +8,77 @@ the state of play and should be updated as things change.
 
 | Piece | State on 27 Nov 2026 |
 |---|---|
-| **This app** | Nothing built. This repository has the specification, the design system and the logo |
+| **This app** | **Phase 1 built on branch `1.0.0`, running on this computer only** (see "Phase 1" below). Checked against a stand-in backend, and against the real job `RB-1001`, which it confirmed on 28 Nov 2026. Not deployed, nothing created on Cloudflare |
 | **mrkdevelopment.net** (mrkwp-core 1.8.1) | **Live.** Sign-ups become numbered jobs, the client is emailed their private link, the builders are emailed. Three routes exist for this app (below). Tested with a real sign-up: job `RB-1001` |
 | **www.mrkwp.com sign-up form** | Not built. Until it is, sign-ups are made by posting to the rebuild webhook by hand |
 | **MRK-Web job mode** | Not built. Specified in the MRK-Web repository |
 
 So today a person can sign up (by hand), get an email with a link to
-`https://build.mrkwp.com/rebuild/RB-1001?k=<code>`, and that link opens nothing. **Making that link open
-something is the first job here.**
+`https://build.mrkwp.com/rebuild/RB-1001?k=<code>`, and that link opens nothing until this app is
+deployed. The code that opens it is written (phase 1, below).
+
+## Phase 1: what is built, and how to run it
+
+Built: link sign-in, the welcome screen and its Start button, the holding screen for `confirmed`, a plain
+screen for every other stage, the progress strip, the `/` page, `noindex`, and the outbox with its
+one-minute worker.
+
+| To do this | Run |
+|---|---|
+| Use Homebrew's Node 26 first | `export PATH="/opt/homebrew/bin:$PATH"` |
+| Run against a made-up job, no real data | `node tests/fake-backend.mjs`, then `npm run dev:test`. The link to open is at the top of `tests/fake-backend.mjs` |
+| Run against mrkdevelopment.net | Fill in `.dev.vars` (below), `npm run db:local` once, then `npm run dev` |
+| Tests, and a full build | `npm test`, `npm run build` |
+
+Astro prints the address when it starts. It is `localhost:4321` unless another project has that port.
+
+Where things are: `src/lib/` (sign-in, the D1 copy, the outbox, calls to the backend), `src/products/rebuild/`
+(the stage-to-screen map and the rebuild's own screens), `src/worker.ts` (the once-a-minute outbox run),
+`migrations/` (the D1 tables), `wrangler.jsonc` (Cloudflare set-up).
+
+**Checked against the stand-in:** a good link signs in and drops the code from the address; a wrong code,
+an unknown number, a wrong product and another job's number all show "this link isn't right"; Start
+confirms the job, once, however often it is pressed; with the backend down the job still opens, the link
+still works on a second device, and the confirm arrives once the backend is back; the screens at phone
+width.
+
+**Checked against mrkdevelopment.net with the real job `RB-1001` (28 Nov 2026):** the service account and
+firewall user agent are accepted; the real link signs in (in capitals or lower case) and drops the code
+from the address; a wrong code, no code, an unknown number, another job's number with this session and
+the wrong product all show "this link isn't right"; Start moved `RB-1001` from `signed_up` to `confirmed`
+on mrkdevelopment.net and left nothing waiting in the outbox. **`RB-1001` is now confirmed, so it can't
+test the welcome screen again; make a new sign-up for that.**
+
+**Known gap on a developer's computer:** under `npm run dev` the two brand fonts don't load (the page falls
+back to Arial). The built app serves them correctly (`npm run build`, then `npm run preview`), so judge
+the look there.
+
+**Not checked yet:** that the contact got the `rebuild: confirmed` tag in FluentCRM (Matt to look);
+a real phone; the deployed worker's one-minute schedule (locally it was triggered by hand).
+
+**Not built yet, on purpose:** rate limits on link checks, the strict content security policy, the hook,
+the daily check, and the `scan_runs` and `stripe_events` tables. Each belongs to a later phase.
+
+**Before the first deploy:** the D1 database and R2 bucket named in `wrangler.jsonc` don't exist yet, and
+the database id there is a stand-in. Astro's Cloudflare adapter also asks for a KV store called `SESSION`
+on first deploy, which this app doesn't use; decide then whether to let it or switch it off.
+
+**Decisions made while building, to confirm with Matt:**
+
+- The five steps in the progress strip are the tiles planned for the landing page: Sign up, Your business,
+  Five designs, Pick and pay, Go live.
+- While a client's answer is still waiting in the outbox, a fresh copy from mrkdevelopment.net does not
+  overwrite the copy here. Otherwise pressing Start during an outage would bounce them back to Welcome.
+- A job's outbox rows are sent in the order the client made them; a row that can't go yet holds the later
+  ones back.
+- A job already held here has its link checked against the stored code, without asking mrkdevelopment.net.
+- A browser is signed in to one job at a time.
 
 ## Before any code: three things from Matt
+
+**State on 27 Nov 2026:** the account is chosen (**MRK WP**, set in `wrangler.jsonc`). The service account
+and the firewall user agent are in `.dev.vars` and work (28 Nov 2026). They still need typing into
+Cloudflare's secrets before the first deploy.
 
 1. **Which Cloudflare account** this project is created in. Matt has several, including clients'. List
    them and wait for his answer. Never guess.

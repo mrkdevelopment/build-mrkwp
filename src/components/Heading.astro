@@ -1,0 +1,13 @@
+---
+// Two-tone headline: the plain statement in navy, the payoff in blue.
+interface Props {
+  plain: string;
+  payoff?: string;
+}
+const { plain, payoff } = Astro.props;
+---
+
+<h1 class="text-3xl leading-[1.1] font-bold sm:text-5xl">
+  {plain}
+  {payoff && <span class="text-signal"> {payoff}</span>}
+</h1>
