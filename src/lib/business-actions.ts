@@ -1,6 +1,6 @@
 // "Your business": what happens when a client presses a button. Each step is saved here first;
 // finished answers are queued for mrkdevelopment.net through the outbox.
-import { CHECK_LOST_MS, MAX_CHECKS, businessOf, changeLine, checkMissed, correctionsOf, linesFrom, newDraft, removeLine, tidy, tidyLong, type Draft } from './business.ts';
+import { CHECK_LOST_MS, MAX_CHECKS, NOT_FIT_WAIT_MS, businessOf, changeLine, checkMissed, correctionsOf, goBackTo, homeOf, linesFrom, newDraft, removeLine, stepBefore, tidy, tidyLong, type Draft } from './business.ts';
 import { drain } from './outbox.ts';
 import { decideFit, emptyResult, type ScanResult } from './scan/checks.ts';
 import { normaliseAddress } from './scan/fetch.ts';
@@ -82,10 +82,12 @@ export async function finishCheck(env: Env, number: string, runId: number, addre
   }
 
   if (result.fit === 'no') {
+    // Shown straight away, but not reported yet: the client may have typed the wrong address, and
+    // once mrkdevelopment.net is told, only staff can reopen the job. See reportNotFits below.
+    draft.note = '';
+    draft.lines = [];
+    draft.step = 'not_fit';
     await saveDraft(env.DB, number, draft);
-    const business = { website: result.final_url || address };
-    await recordAction(env.DB, row, 'details', { business, scan: result }, 'not_a_fit', { business, scan: result });
-    await drain(env, number);
     return;
   }
 
@@ -93,6 +95,25 @@ export async function finishCheck(env: Env, number: string, runId: number, addre
   draft.lines = linesFrom(result);
   draft.step = 'found';
   await saveDraft(env.DB, number, draft);
+}
+
+/**
+ * Tells mrkdevelopment.net about jobs that have sat on "needs a conversation" long enough that the
+ * address was clearly not a slip. Run once a minute, before the outbox is sent.
+ */
+export async function reportNotFits(env: Env): Promise<void> {
+  const before = new Date(Date.now() - NOT_FIT_WAIT_MS).toISOString();
+  const waiting = await env.DB
+    .prepare("SELECT number FROM drafts WHERE json_extract(data, '$.step') = 'not_fit' AND updated_at < ? LIMIT 20")
+    .bind(before)
+    .all<{ number: string }>();
+  for (const { number } of waiting.results) {
+    const row = await getJob(env.DB, number);
+    const result = await lastResult(env, number);
+    if (!row || row.stage !== 'confirmed' || !result) continue;
+    const business = { website: homeOf(result.final_url || result.address) };
+    await recordAction(env.DB, row, 'details', { business, scan: result }, 'not_a_fit', { business, scan: result });
+  }
 }
 
 async function lastResult(env: Env, number: string): Promise<ScanResult | null> {
@@ -116,6 +137,8 @@ async function lookUpAbn(env: Env, abn: string): Promise<{ status: string; name:
 
 /** Keeps what has been typed so far on "Anything we missed?" and "What you want", without judging it. */
 export function keepTyped(draft: Draft, form: FormData): void {
+  if (form.has('phone')) draft.phone = tidy(form.get('phone'), 30);
+  if (form.has('postal')) draft.postal = tidy(form.get('postal'), 200);
   if (form.has('abn')) draft.abn = tidy(form.get('abn'), 20);
   if (form.has('google')) draft.google = tidy(form.get('google'), 500);
   for (const [name, value] of form) {
@@ -134,10 +157,12 @@ export async function businessAction(env: Env, row: JobRow, form: FormData, late
 
   if (what === 'keep') {
     keepTyped(draft, form);
-  } else if (what === 'restart' && (draft.step === 'found' || draft.step === 'missed')) {
-    draft.step = 'address';
-    draft.note = '';
-    draft.lines = [];
+  } else if (what === 'back') {
+    // Whatever was typed on this screen is kept, so coming forward again loses nothing.
+    keepTyped(draft, form);
+    goBackTo(draft, stepBefore(draft.step) ?? '');
+  } else if (what === 'goto') {
+    goBackTo(draft, String(form.get('step') ?? ''));
   } else if (draft.step === 'found') {
     const key = String(form.get('key') ?? '');
     if (what === 'change') draft.error = changeLine(draft, key, form.get('value'));
@@ -147,7 +172,17 @@ export async function businessAction(env: Env, row: JobRow, form: FormData, late
   } else if (draft.step === 'missed' && what === 'missed') {
     keepTyped(draft, form);
     draft.error = checkMissed(draft);
-    if (!draft.error) {
+    if (!draft.error) draft.step = 'wants';
+  } else if (draft.step === 'wants' && what === 'wants') {
+    keepTyped(draft, form);
+    draft.step = 'summary';
+  } else if (draft.step === 'summary' && what === 'send') {
+    // Nothing is sent to mrkdevelopment.net until this moment, so going back and changing an
+    // answer never leaves an old version on its way.
+    draft.error = checkMissed(draft);
+    if (draft.error) {
+      draft.step = 'missed';
+    } else {
       const result = (await lastResult(env, row.number)) ?? emptyResult(draft.address);
       const abn = draft.abn.replace(/\s/g, '');
       const found = abn ? await lookUpAbn(env, abn) : null;
@@ -157,20 +192,15 @@ export async function businessAction(env: Env, row: JobRow, form: FormData, late
         result.fit = 'unsure';
         result.fit_reasons = [...new Set([...result.fit_reasons, 'abn_not_active'])];
       }
-      const business = businessOf(draft, result.final_url || normaliseAddress(draft.address) || draft.address);
+      const business = businessOf(draft, homeOf(result.final_url || normaliseAddress(draft.address) || draft.address));
       const scan = { ...result, client_corrections: correctionsOf(draft.lines) };
-      draft.step = 'wants';
       await saveDraft(env.DB, row.number, draft);
       await recordAction(env.DB, row, 'details', { business, scan }, 'confirmed', { business, scan });
+      const fresh = (await getJob(env.DB, row.number)) ?? row;
+      await recordAction(env.DB, fresh, 'goals', { goals: draft.goals }, 'ready', { goals: draft.goals });
       later(drain(env, row.number));
       return;
     }
-  } else if (draft.step === 'wants' && what === 'wants') {
-    keepTyped(draft, form);
-    await saveDraft(env.DB, row.number, draft);
-    await recordAction(env.DB, row, 'goals', { goals: draft.goals }, 'ready', { goals: draft.goals });
-    later(drain(env, row.number));
-    return;
   }
   await saveDraft(env.DB, row.number, draft);
 }

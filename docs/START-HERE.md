@@ -94,18 +94,20 @@ doesn't use. The first deploy created it by itself, as `build-mrkwp-session`. It
 - A job already held here has its link checked against the stored code, without asking mrkdevelopment.net.
 - A browser is signed in to one job at a time.
 
-## Phase 2: "Your business" (version 1.1.0, built 28 Nov 2026, not deployed)
+## Phase 2: "Your business" (1.1.0 live on 28 Nov 2026; 1.1.1 built, not deployed)
 
-On branch `1.1.0`. A job at `confirmed` now walks through four short screens instead of the holding screen.
+A job at `confirmed` walks through these short screens. 1.1.1 (branch `1.1.1`) adds the phone and address
+boxes, Back on every step, and the summary screen.
 
 | Screen | What happens |
 |---|---|
 | **Let's look at your website** | One box, filled in from the sign-up form's `website` when there is one. "Check my site" starts the check |
 | **Checking your website** | Shown while the check runs (about ten seconds). The page reloads itself |
 | **Here's what we found** | Business name, logo, main colour, phone, address, social pages, page count; the technical findings folded away. Each line can be changed or removed |
-| **Anything we missed?** | ABN, Google Business Profile link, and only the social pages the check didn't find. All optional |
-| **What should your new website do better?** | One optional box. "Start my designs" moves the job to `ready` |
-| **This one needs a conversation** | For a shop, a members' area or more than 300 pages. Says why and offers the free call |
+| **Anything we missed?** | Phone and address when the check didn't find them, ABN, Google Business Profile link, and only the social pages the check didn't find. All optional |
+| **What should your new website do better?** | One optional box |
+| **Check your details, then send** | Every answer, each with a Change button back to its step. "Start my designs" sends both answers and moves the job to `ready`. Nothing is sent before this |
+| **This one needs a conversation** | For a shop, a members' area or more than 300 pages. Says why, names the address checked, and offers the free call. For the first fifteen minutes it has a Back button to check a different address; nothing is sent to mrkdevelopment.net in that time. After that the once-a-minute run sends `details` with fit `no`, the job becomes `not_a_fit`, and only staff can reopen it |
 
 Where things are: `src/lib/scan/` (the checks: `fetch.ts` is the safe way to request a stranger's address,
 `html.ts` reads facts out of a page, `checks.ts` holds every rule, `run.ts` runs them together),
@@ -152,13 +154,18 @@ conversation"); mrkdevelopment.net (found, corrected, finished, both answers acc
 told to accept them, and held in the outbox when not); typing that saves itself; the wrong-link limit; the
 built app with the security policy on; every screen at phone width.
 
-**Not checked:** against the real backend; on Cloudflare itself (the checks make up to 40 requests, and the
-free plan allows 50 per visit); a real client's site with a shop or members' area (those rules are tested
+**Checked on the live site (28 Nov 2026, 1.1.0):** Matt took real job `RB-1002` through every screen with
+mattonamission.com. The check ran in two seconds and found the name, logo, platform, page count, social
+pages, email and domain details. Both answers are waiting in the outbox for the backend.
+
+**Not checked:** the backend receiving the answers; 1.1.1 on the live site; a real client's site with a shop or members' area (those rules are tested
 with made-up pages only); the ABN look-up; a real phone.
 
-**Before deploying 1.1.0:** the three new tables must be added to the live database first, or every
-confirmed job will show an error: `npx wrangler d1 migrations apply DB --remote`. The booking link for the
-free call is a stand-in (the contact page) in `src/products/rebuild/config.ts`: Matt to give the real one.
+**New tables and deploying.** The three tables for 1.1.0 were added to the live database on 28 Nov 2026,
+after the deploy went out without them and every link showed an error. Any later version with a new file in
+`migrations/` needs `npx wrangler d1 migrations apply DB --remote` run **before** it is merged, or the
+deploy command in Cloudflare changed to run it first. 1.1.1 has no new tables. The booking link for the free call is Matt's
+Google Calendar booking page, set in `src/products/rebuild/config.ts` until the backend's `GET /config` exists.
 
 ## Before any code: three things from Matt
 

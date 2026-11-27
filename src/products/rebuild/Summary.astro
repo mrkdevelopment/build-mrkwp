@@ -1,0 +1,52 @@
+---
+// The last look before anything is sent: every answer, each with a way back to change it.
+import Heading from '../../components/Heading.astro';
+import type { SummaryRow } from '../../lib/business.ts';
+
+interface Props {
+  rows: SummaryRow[];
+  /** How many technical findings go to the builders as well. */
+  technical: number;
+}
+const { rows, technical } = Astro.props;
+---
+
+<Heading plain="Check your details," payoff="then send." />
+<p class="mt-5 text-lg leading-relaxed">This is what we'll use to make your five designs. Change anything that isn't right.</p>
+
+<dl class="mt-6 divide-y divide-slate-200 rounded-2xl border border-slate-200 bg-white">
+  {
+    rows.map((row) => (
+      <div class="flex items-start justify-between gap-4 px-4 py-4 sm:px-5">
+        <div class="min-w-0">
+          <dt class="text-sm font-semibold text-slate-600">{row.label}</dt>
+          <dd class:list={['mt-1 break-words text-navy', row.kind === 'long' ? 'leading-relaxed whitespace-pre-line' : 'text-lg font-semibold']}>
+            {row.kind === 'logo' ? (
+              <img src={row.value} alt="Your logo" loading="lazy" referrerpolicy="no-referrer" class="max-h-14 max-w-[10rem] rounded bg-slate-100 object-contain p-1" />
+            ) : (
+              row.value
+            )}
+          </dd>
+        </div>
+        <form method="post" action="/api/job/business" class="shrink-0">
+          <input type="hidden" name="do" value="goto" />
+          <input type="hidden" name="step" value={row.step} />
+          <button type="submit" class="line-button" aria-label={`Change ${row.label}`}>Change</button>
+        </form>
+      </div>
+    ))
+  }
+</dl>
+{technical > 0 && <p class="mt-4 text-sm leading-relaxed text-slate-600">We'll also pass our builders {technical} technical {technical === 1 ? 'detail' : 'details'} from the check of your website.</p>}
+
+<div class="step-buttons">
+  <form method="post" action="/api/job/business">
+    <input type="hidden" name="do" value="back" />
+    <button type="submit" class="btn-secondary"><span aria-hidden="true">←</span> Back</button>
+  </form>
+  <form method="post" action="/api/job/business">
+    <input type="hidden" name="do" value="send" />
+    <button type="submit" class="btn-primary">Start my designs <span aria-hidden="true">→</span></button>
+  </form>
+</div>
+<p class="mt-4 text-sm leading-relaxed text-slate-600">Nothing is sent until you press "Start my designs".</p>

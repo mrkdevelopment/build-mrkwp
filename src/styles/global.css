@@ -48,7 +48,7 @@
 @utility btn-rise-blue { --btn-rise-shadow: rgb(43 89 255 / 0.55); }
 
 @utility btn-primary {
-  @apply btn-rise btn-rise-blue inline-flex items-center gap-2 rounded-xl bg-signal px-7 py-3.5 text-base font-bold text-white shadow-lg shadow-signal/25 hover:bg-signal-deep;
+  @apply btn-rise btn-rise-blue inline-flex items-center gap-2 rounded-xl border border-transparent bg-signal px-7 py-3.5 text-base font-bold text-white shadow-lg shadow-signal/25 hover:bg-signal-deep;
   min-height: 3rem;
 }
 /* A text box or text area, sized for a thumb. 16px text stops phones zooming in on focus. */
@@ -57,12 +57,26 @@
   min-height: 3rem;
   &:focus-visible { outline: 2px solid var(--color-signal); outline-offset: 1px; border-color: var(--color-signal); }
 }
-/* A small button inside a list line. */
+/* A small button inside a list line: always on the right, always the same size. */
 @utility line-button {
-  @apply rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-navy hover:border-signal/40;
+  @apply inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-4 text-sm font-semibold text-navy hover:border-signal/40;
   min-height: 2.75rem;
-  list-style: none;
-  &::-webkit-details-marker { display: none; }
+  min-width: 5.5rem;
+}
+/* The small filled button that saves a change to one line. */
+@utility btn-small {
+  @apply inline-flex items-center justify-center rounded-lg bg-signal px-5 text-sm font-bold text-white hover:bg-signal-deep;
+  min-height: 2.75rem;
+  min-width: 5.5rem;
+}
+/* The two buttons at the foot of a step: Back on the left, the way forward on the right. */
+@utility step-buttons {
+  @apply mt-8 flex items-center justify-between gap-3;
+}
+/* A quiet text button, for a lesser choice inside a line. */
+@utility back-button {
+  @apply inline-flex items-center gap-1.5 rounded-lg px-2 py-2 text-base font-semibold text-slate-600 underline decoration-slate-300 underline-offset-4 hover:text-navy;
+  min-height: 2.75rem;
 }
 @utility checking-bar {
   animation: checking 1.4s ease-in-out infinite alternate;

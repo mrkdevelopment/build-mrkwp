@@ -1,6 +1,26 @@
 # Changelog
 
-## 1.1.0 (built 28 Nov 2026, not yet deployed)
+## 1.1.1 (built 28 Nov 2026, not yet deployed)
+
+Changes to "Your business" after Matt tried it on a real site.
+
+- **Phone and address are asked for.** When the check of the website doesn't find them, "Anything we
+  missed?" now has a box for each. Both optional.
+- **Back on every step.** A client can go back one screen at a time, and nothing they typed is lost.
+- **A summary before sending.** A new last screen, "Check your details, then send", lists every answer with
+  a Change button beside each. Nothing goes to mrkdevelopment.net until "Start my designs" is pressed there.
+- **"Here's what we found" is tidier.** Each line has its value on the left and one button, always the same
+  size, on the right. Pressing Change turns the value into a text box in the same place, with Save and
+  Cancel. Lines that can't be edited have a single Remove button, and a removed line can be put back.
+- **A way back from "This one needs a conversation".** A client who typed the wrong address (or someone
+  else's shop) can press Back and check a different one. The screen also names the address that was
+  checked. We hold off telling mrkdevelopment.net for fifteen minutes; after that the job is marked not a
+  fit and only staff can reopen it.
+- **"Book a free 20-minute call" now opens Matt's booking calendar** instead of the contact page.
+- **Fixed:** a Facebook page without a custom name was saved without the part that identifies it.
+- The website is shown as its home address, even when the check ended on an inner page.
+
+## 1.1.0 (28 Nov 2026)
 
 "Your business": after pressing Start, a client now tells us about their business in a few short screens.
 
