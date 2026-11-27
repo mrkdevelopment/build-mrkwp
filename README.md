@@ -4,8 +4,8 @@ The source for **build.mrkwp.com**: the app a client uses after signing up for a
 website rebuild they tell us about their business, see what our checks found, view and rank five
 designs, choose extras, pay through Stripe, view their demo and approve it.
 
-The first phase is built and runs on a developer's computer: the emailed link signs a client in, shows
-the welcome screen, and confirms their job. It is not deployed yet. `docs/START-HERE.md` says what
+The first phase is live at build.mrkwp.com: the emailed link signs a client in, shows the welcome
+screen, and confirms their job. `docs/START-HERE.md` says what
 exists today, how to run it, and what comes next. `CHANGELOG.md` lists what each version added.
 
 ## What's here
@@ -32,8 +32,6 @@ exists today, how to run it, and what comes next. `CHANGELOG.md` lists what each
 
 - A logo file of at least 512 px (an SVG is best). The app's home-screen icons need 192 and 512 px, and
   the only logo file so far is 128 px.
-- A service account and application password on mrkdevelopment.net, and the firewall user agent, typed
-  into Cloudflare's secrets by Matt.
 
-The backend's first piece is live (mrkwp-core 1.8.1): sign-ups become jobs, clients are emailed their
+The backend's first piece is live (mrkwp-core 1.8.2): sign-ups become jobs, clients are emailed their
 link, and this app can read a job and mark it confirmed.

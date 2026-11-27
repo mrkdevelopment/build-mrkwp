@@ -27,5 +27,13 @@ export default defineConfig({
       fallbacks: ['sans-serif'],
     },
   ],
+  // A strict content security policy on every page (built pages only; Astro can't apply it under
+  // `astro dev`). Nothing loads from anywhere but this app, except pictures over https: the client's
+  // own logo, shown back to them on "Here's what we found".
+  security: {
+    csp: {
+      directives: ["default-src 'none'", "img-src 'self' data: https:", "font-src 'self'", "connect-src 'self'", "form-action 'self'", "base-uri 'none'"],
+    },
+  },
   vite: { plugins: [tailwindcss()] },
 });

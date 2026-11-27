@@ -8,8 +8,10 @@ interface Props {
   /** Shown in the header on every screen of a job. */
   jobNumber?: string;
   progress?: { steps: string[]; done: number };
+  /** Reload the page by itself after this many seconds (the "checking your website" screen). */
+  refresh?: number;
 }
-const { title, jobNumber, progress } = Astro.props;
+const { title, jobNumber, progress, refresh } = Astro.props;
 ---
 
 <!doctype html>
@@ -19,6 +21,7 @@ const { title, jobNumber, progress } = Astro.props;
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="robots" content="noindex, nofollow" />
     <meta name="theme-color" content="#F8FAFC" />
+    {refresh && <meta http-equiv="refresh" content={String(refresh)} />}
     <title>{title} | MRK WP Build</title>
     <link rel="icon" type="image/png" href="/favicon.png" />
     <Font cssVariable="--font-outfit" />

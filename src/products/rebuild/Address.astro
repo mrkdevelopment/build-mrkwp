@@ -1,0 +1,50 @@
+---
+// "Your business", first screen: one box, their web address.
+import Heading from '../../components/Heading.astro';
+
+interface Props {
+  address: string;
+  /** Why the last check couldn't read the site. */
+  note: string;
+}
+const { address, note } = Astro.props;
+const shown = address.replace(/^https?:\/\//i, '').replace(/\/$/, '');
+
+const NOTES: Record<string, string> = {
+  invalid: "That doesn't look like a web address. It should look like yourbusiness.com.au.",
+  missing: `We couldn't find a website at ${shown}. Check the spelling and try again.`,
+  parked: `${shown} shows a holding page, not a website. Check the address and try again.`,
+  blocked: `Your website didn't let our check in. Make sure the address is right and try once more. If it happens again we'll carry on and look at your site by hand.`,
+  slow: `${shown} took too long to answer. Check the address and try once more.`,
+  error: `We couldn't open ${shown} just now. Check the address and try once more.`,
+};
+const message = note ? (NOTES[note] ?? NOTES.error) : '';
+---
+
+<Heading plain="Let's look at" payoff="your website." />
+<p class="mt-5 text-lg leading-relaxed">
+  We'll read your public website to find your business name, logo, colours and the tools it uses. It takes about ten seconds.
+</p>
+<form method="post" action="/api/job/business" class="mt-8">
+  <input type="hidden" name="do" value="check" />
+  <label for="address" class="block font-semibold text-navy">Your website address</label>
+  {message && <p id="address-note" role="alert" class="mt-2 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 leading-relaxed text-amber-900">{message}</p>}
+  <input
+    id="address"
+    name="address"
+    type="text"
+    inputmode="url"
+    autocapitalize="none"
+    autocorrect="off"
+    spellcheck="false"
+    autocomplete="url"
+    required
+    maxlength="300"
+    value={shown}
+    placeholder="yourbusiness.com.au"
+    aria-describedby={message ? 'address-note' : undefined}
+    class="field mt-2"
+  />
+  <button type="submit" class="btn-primary mt-6">Check my site <span aria-hidden="true">→</span></button>
+</form>
+<p class="mt-6 text-sm leading-relaxed text-slate-600">We only read pages anyone can see. We never ask for a password.</p>

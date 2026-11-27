@@ -8,6 +8,8 @@ export interface Job {
   stage: string;
   created_at: string;
   first_name: string;
+  /** The address typed on the sign-up form, or '' (mrkwp-core 1.8.2 and later). */
+  website?: string;
   [part: string]: unknown;
 }
 

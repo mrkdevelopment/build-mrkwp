@@ -8,8 +8,8 @@ the state of play and should be updated as things change.
 
 | Piece | State on 27 Nov 2026 |
 |---|---|
-| **This app** | **Phase 1 built as version `1.0.0` and merged into `main` on 28 Nov 2026; first deploy under way** (see "Phase 1" below). Checked against a stand-in backend, and against the real job `RB-1001`, which it confirmed on 28 Nov 2026. Not deployed yet; its database exists on Cloudflare |
-| **mrkdevelopment.net** (mrkwp-core 1.8.1) | **Live.** Sign-ups become numbered jobs, the client is emailed their private link, the builders are emailed. Three routes exist for this app (below). Tested with a real sign-up: job `RB-1001` |
+| **This app** | **Phase 1 is live at build.mrkwp.com (version 1.0.1, 28 Nov 2026)** (see "Phase 1" below). Checked against a stand-in backend, and against the real job `RB-1001`, which it confirmed on 28 Nov 2026. Not deployed yet; its database exists on Cloudflare |
+| **mrkdevelopment.net** (mrkwp-core 1.8.2) | **Live.** Sign-ups become numbered jobs, the client is emailed their private link, the builders are emailed. Three routes exist for this app (below). Tested with a real sign-up: job `RB-1001` |
 | **www.mrkwp.com sign-up form** | Not built. Until it is, sign-ups are made by posting to the rebuild webhook by hand |
 | **MRK-Web job mode** | Not built. Specified in the MRK-Web repository |
 
@@ -54,29 +54,34 @@ back to Arial). The built app serves them correctly (`npm run build`, then `npm 
 the look there.
 
 **Not checked yet:** that the contact got the `rebuild: confirmed` tag in FluentCRM (Matt to look);
-a real phone; the deployed worker's one-minute schedule (locally it was triggered by hand).
+a real phone; the Welcome screen and Start on the live site (needs a new sign-up, since `RB-1001` is
+already confirmed); the live one-minute schedule sending something that had to wait.
 
-**Not built yet, on purpose:** rate limits on link checks, the strict content security policy, the hook,
+**Not built yet, on purpose:** the hook,
 the daily check, and the `scan_runs` and `stripe_events` tables. Each belongs to a later phase.
 
 **On Cloudflare (MRK WP account) on 28 Nov 2026:** the D1 database `build-mrkwp` exists (Oceania) with
-its tables, and its id is in `wrangler.jsonc`. The app has not been deployed.
+its tables, and its id is in `wrangler.jsonc`. The app was first deployed on 28 Nov 2026.
 
 **Deploying** is done by Cloudflare from GitHub's `main` branch: build command `npm run build`, deploy
-command `npx wrangler deploy`, preview builds off. `.node-version` asks the builder for Node 24. Still to do:
+command `npx wrangler deploy`, preview builds off. `.node-version` asks the builder for Node 24. The four secrets
+(`BUILD_API_USER`, `BUILD_API_PASSWORD`, `WP_USER_AGENT`, `SESSION_SECRET`) are in the worker's Settings →
+Variables and Secrets, and the custom domain is attached. Never change `SESSION_SECRET`: saved links stop
+working until re-opened from the email. A new secret also needs its name adding to `src/secrets.d.ts`,
+or the build on Cloudflare fails.
 
-- Merge `1.0.0` into `main` and push it.
-- After the first deploy, Matt types four secrets into the worker's Settings → Variables and Secrets:
-  `BUILD_API_USER`, `BUILD_API_PASSWORD`, `WP_USER_AGENT`, and a new `SESSION_SECRET` (never change it
-  afterwards: saved links stop working until re-opened from the email).
-- Add the custom domain `build.mrkwp.com` to the worker. That is when emailed links start working.
+**Checked on the live site (28 Nov 2026):** the home page, the brand fonts, `noindex` and the other
+headers; a wrong code, no code, an unknown number, the wrong product and another job's number all show
+"this link isn't right"; a form posted from another site is refused; `RB-1001`'s real link signs in,
+drops the code from the address and shows the holding screen at phone width.
+
 - New tables in a later version are added with `npx wrangler d1 migrations apply DB --remote`.
 
 **The picture store** `build-mrkwp-pictures` (R2, Oceania, no public address) also exists there and is
 named in `wrangler.jsonc` as `PICTURES`. Nothing uses it until the designs phase.
 
 Astro's Cloudflare adapter also asks for a KV store called `SESSION` on first deploy, which this app
-doesn't use. Not yet seen whether an automated deploy creates it by itself.
+doesn't use. The first deploy created it by itself, as `build-mrkwp-session`. It stays empty.
 
 **Decisions made while building, to confirm with Matt:**
 
@@ -88,6 +93,72 @@ doesn't use. Not yet seen whether an automated deploy creates it by itself.
   ones back.
 - A job already held here has its link checked against the stored code, without asking mrkdevelopment.net.
 - A browser is signed in to one job at a time.
+
+## Phase 2: "Your business" (version 1.1.0, built 28 Nov 2026, not deployed)
+
+On branch `1.1.0`. A job at `confirmed` now walks through four short screens instead of the holding screen.
+
+| Screen | What happens |
+|---|---|
+| **Let's look at your website** | One box, filled in from the sign-up form's `website` when there is one. "Check my site" starts the check |
+| **Checking your website** | Shown while the check runs (about ten seconds). The page reloads itself |
+| **Here's what we found** | Business name, logo, main colour, phone, address, social pages, page count; the technical findings folded away. Each line can be changed or removed |
+| **Anything we missed?** | ABN, Google Business Profile link, and only the social pages the check didn't find. All optional |
+| **What should your new website do better?** | One optional box. "Start my designs" moves the job to `ready` |
+| **This one needs a conversation** | For a shop, a members' area or more than 300 pages. Says why and offers the free call |
+
+Where things are: `src/lib/scan/` (the checks: `fetch.ts` is the safe way to request a stranger's address,
+`html.ts` reads facts out of a page, `checks.ts` holds every rule, `run.ts` runs them together),
+`src/lib/business.ts` (which screen, and what the answers look like), `src/lib/business-actions.ts` (what
+each button does), `src/products/rebuild/` (the screens), `migrations/0002_site_checks.sql` (three new tables).
+
+**How it differs from the specification, and why:**
+
+- **ABN, Google Business link and social pages are asked after the check,** not on the first screen, so a
+  client is never asked for something the check already found.
+- **A site that can't be read is never turned away.** The client is asked to check the address once; if it
+  still can't be read the job carries on as fit `unsure` with the reason `unreadable`, for a person to look
+  at. Sites that block automatic visits are common and are not bad sites.
+- **A page count that is only an estimate never turns someone away.** Over 300 pages is `no` only when
+  every page was counted from the sitemap; an estimate over 300 is `unsure`.
+- **What a client changes or removes is kept alongside what was found,** in `scan.client_corrections`
+  (`key`, `found`, `now`). The `scan` itself is sent as found, so a removed tool still counts until a
+  person has looked.
+- **The confirmed business name, phone and address are sent inside `business`** (`name`, `phone`,
+  `address`), next to the fields the contract lists. **Ask Matt to add them to the contract and mrkwp-core,**
+  or they may be dropped when the `details` action is built.
+- **Social pages are stored, not requested.** Facebook and Instagram forbid it, and it saves requests.
+- **Not built:** the speed check (needs `PAGESPEED_API_KEY`). The ABN look-up is built but only runs when
+  `ABN_LOOKUP_GUID` is set as a secret, and has never been run; without it an ABN is only checked for the
+  right 11 digits.
+
+**Also added in 1.1.0, now the site is public:**
+
+- **A limit on wrong links:** ten from one connection in ten minutes, then every link from there gets a
+  "wait ten minutes" page. The connection is stored only in scrambled form. Someone already signed in is
+  not affected.
+- **A strict content security policy** on every page (Astro's `security.csp`). It only applies to the built
+  app, not under `npm run dev`.
+
+**Waiting on the backend.** mrkwp-core 1.8.2 doesn't take `details` or `goals` yet, so those answers wait in
+the outbox and are retried each hour. Until they are accepted, the copy here stays ahead of mrkdevelopment.net:
+a client sees "We're on it" while the master record still says `confirmed`, **and the builders are not told
+the job is ready.** Phase 2 should not go live for real clients until the backend takes both actions.
+
+**Checked (28 Nov 2026):** 21 tests, including every check rule against made-up pages and a refusal to
+follow a redirect to a private address. In the local app against the stand-in backend: a mistyped address;
+a site that doesn't exist, twice (asked to retry, then carried on); www.mrkwp.com (365 pages, "needs a
+conversation"); mrkdevelopment.net (found, corrected, finished, both answers accepted by the stand-in when
+told to accept them, and held in the outbox when not); typing that saves itself; the wrong-link limit; the
+built app with the security policy on; every screen at phone width.
+
+**Not checked:** against the real backend; on Cloudflare itself (the checks make up to 40 requests, and the
+free plan allows 50 per visit); a real client's site with a shop or members' area (those rules are tested
+with made-up pages only); the ABN look-up; a real phone.
+
+**Before deploying 1.1.0:** the three new tables must be added to the live database first, or every
+confirmed job will show an error: `npx wrangler d1 migrations apply DB --remote`. The booking link for the
+free call is a stand-in (the contact page) in `src/products/rebuild/config.ts`: Matt to give the real one.
 
 ## Before any code: three things from Matt
 
@@ -121,8 +192,14 @@ Things to rely on:
   "this link isn't right" page for all three.
 - **No sign-in answers 401.**
 - **The client's view** has exactly these keys: `number`, `product`, `stage`, `created_at` (UTC, ends in
-  `Z`), `first_name`, `business`, `scan`, `goals`, `designs`, `ranking`, `extras`, `price`, `demo`.
+  `Z`), `first_name`, `website`, `business`, `scan`, `goals`, `designs`, `ranking`, `extras`, `price`,
+  `demo`.
   It never has the email, phone, who claimed the job, costs or history.
+- **`website` is the address typed on the sign-up form** (added in mrkwp-core 1.8.2, seen live on
+  28 Nov 2026). It is a full address starting `http://` or `https://`, or an empty string. It is empty
+  for jobs made before the form asked for it, and whenever the form didn't send one: the backend treats
+  it as optional and drops anything that isn't an address. So "Your business" must still be able to ask
+  for it. It is separate from `business.website`, which is what the client confirms in this app.
 - **Empty parts arrive as `[]`, not `{}`.** `business`, `scan`, `ranking`, `extras`, `price`, `demo` are
   objects once filled, but PHP sends an empty one as an empty list. Treat `[]` as "nothing yet" when
   reading them.
@@ -184,8 +261,8 @@ Done when: the link in a real confirm email opens the welcome screen on a phone;
 job to `confirmed`; a wrong code shows the "isn't right" page; another job's number with this session
 shows nothing; and with mrkdevelopment.net unreachable, a job already opened still opens.
 
-Then phase 2: "Your business" and the scans (section 5), which need nothing from the backend to build
-and test, since scan results are saved here first.
+Phase 2, "Your business" and the scans, is built: see the section above. Next is phase 3, the designs,
+which needs the backend's designs upload and hook (see "What the backend does not offer yet").
 
 ## Small things that will save time
 

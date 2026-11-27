@@ -63,8 +63,8 @@ export const touchJob = (db: D1Database, number: string): Promise<unknown> =>
   db.prepare('UPDATE jobs SET fetched_at = ? WHERE number = ?').bind(now(), number).run();
 
 /** Something the client did: change the copy here and queue it for mrkdevelopment.net, together. */
-export async function recordAction(db: D1Database, row: JobRow, action: string, body: object, newStage: string): Promise<void> {
-  const data = JSON.stringify({ ...JSON.parse(row.data), stage: newStage });
+export async function recordAction(db: D1Database, row: JobRow, action: string, body: object, newStage: string, patch: Record<string, unknown> = {}): Promise<void> {
+  const data = JSON.stringify({ ...JSON.parse(row.data), ...patch, stage: newStage });
   await db.batch([
     db.prepare('UPDATE jobs SET stage = ?, data = ?, updated_at = ? WHERE number = ?').bind(newStage, data, now(), row.number),
     db
@@ -102,3 +102,56 @@ export const outboxLater = (db: D1Database, id: number, attempts: number, nextTr
     .prepare('UPDATE outbox SET attempts = ?, next_try_at = ?, last_error = ?, flagged = ? WHERE id = ?')
     .bind(attempts, nextTryAt, error, flagged ? 1 : 0, id)
     .run();
+
+// ---- Site checks -------------------------------------------------------------------------------
+
+export interface ScanRunRow {
+  id: number;
+  number: string;
+  address: string;
+  started_at: string;
+  finished_at: string | null;
+  result: string | null;
+}
+
+export const latestRun = (db: D1Database, number: string): Promise<ScanRunRow | null> =>
+  db.prepare('SELECT * FROM scan_runs WHERE number = ? ORDER BY id DESC LIMIT 1').bind(number).first<ScanRunRow>();
+
+export async function countRuns(db: D1Database, number: string): Promise<number> {
+  return (await db.prepare('SELECT COUNT(*) AS n FROM scan_runs WHERE number = ?').bind(number).first<{ n: number }>())?.n ?? 0;
+}
+
+export async function startRun(db: D1Database, number: string, address: string): Promise<number> {
+  const made = await db.prepare('INSERT INTO scan_runs (number, address, started_at) VALUES (?, ?, ?)').bind(number, address, now()).run();
+  return made.meta.last_row_id;
+}
+
+export const finishRun = (db: D1Database, id: number, result: object): Promise<unknown> =>
+  db.prepare('UPDATE scan_runs SET finished_at = ?, result = ? WHERE id = ?').bind(now(), JSON.stringify(result), id).run();
+
+// ---- Work in progress on "Your business" -------------------------------------------------------
+
+export async function getDraft<T>(db: D1Database, number: string): Promise<T | null> {
+  const row = await db.prepare('SELECT data FROM drafts WHERE number = ?').bind(number).first<{ data: string }>();
+  return row ? (JSON.parse(row.data) as T) : null;
+}
+
+export const saveDraft = (db: D1Database, number: string, draft: object): Promise<unknown> =>
+  db
+    .prepare('INSERT INTO drafts (number, data, updated_at) VALUES (?1, ?2, ?3) ON CONFLICT (number) DO UPDATE SET data = ?2, updated_at = ?3')
+    .bind(number, JSON.stringify(draft), now())
+    .run();
+
+// ---- Wrong links tried -------------------------------------------------------------------------
+
+const bucket = (): string => new Date(Math.floor(Date.now() / 600_000) * 600_000).toISOString();
+
+export async function triesSoFar(db: D1Database, key: string): Promise<number> {
+  return (await db.prepare('SELECT n FROM attempts WHERE key = ? AND bucket = ?').bind(key, bucket()).first<{ n: number }>())?.n ?? 0;
+}
+
+export const countTry = (db: D1Database, key: string): Promise<unknown> =>
+  db.batch([
+    db.prepare('INSERT INTO attempts (key, bucket, n) VALUES (?1, ?2, 1) ON CONFLICT (key, bucket) DO UPDATE SET n = n + 1').bind(key, bucket()),
+    db.prepare('DELETE FROM attempts WHERE bucket < ?').bind(new Date(Date.now() - 3_600_000).toISOString()),
+  ]);

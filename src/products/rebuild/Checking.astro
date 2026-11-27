@@ -1,0 +1,17 @@
+---
+// Shown while the site check runs. The page reloads itself every few seconds (see Layout's `refresh`).
+import Heading from '../../components/Heading.astro';
+
+interface Props {
+  address: string;
+  here: string;
+}
+const { address, here } = Astro.props;
+---
+
+<Heading plain="Checking" payoff="your website." />
+<p class="mt-5 text-lg leading-relaxed" role="status">
+  We're reading <span class="font-semibold text-navy">{address.replace(/^https?:\/\//i, '').replace(/\/$/, '')}</span>. This takes about ten seconds, and this page updates by itself.
+</p>
+<div class="mt-8 h-2 overflow-hidden rounded-full bg-slate-200" aria-hidden="true"><div class="checking-bar h-full w-1/3 rounded-full bg-signal"></div></div>
+<p class="mt-8 leading-relaxed">Nothing happening? <a class="font-semibold text-signal underline" href={here}>Tap here to look again</a>.</p>
