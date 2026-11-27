@@ -8,7 +8,7 @@ the state of play and should be updated as things change.
 
 | Piece | State on 27 Nov 2026 |
 |---|---|
-| **This app** | **Phase 1 built on branch `1.0.0`, running on this computer only** (see "Phase 1" below). Checked against a stand-in backend, and against the real job `RB-1001`, which it confirmed on 28 Nov 2026. Not deployed, nothing created on Cloudflare |
+| **This app** | **Phase 1 built on branch `1.0.0`, running on this computer only** (see "Phase 1" below). Checked against a stand-in backend, and against the real job `RB-1001`, which it confirmed on 28 Nov 2026. Not deployed yet; its database exists on Cloudflare |
 | **mrkdevelopment.net** (mrkwp-core 1.8.1) | **Live.** Sign-ups become numbered jobs, the client is emailed their private link, the builders are emailed. Three routes exist for this app (below). Tested with a real sign-up: job `RB-1001` |
 | **www.mrkwp.com sign-up form** | Not built. Until it is, sign-ups are made by posting to the rebuild webhook by hand |
 | **MRK-Web job mode** | Not built. Specified in the MRK-Web repository |
@@ -59,9 +59,25 @@ a real phone; the deployed worker's one-minute schedule (locally it was triggere
 **Not built yet, on purpose:** rate limits on link checks, the strict content security policy, the hook,
 the daily check, and the `scan_runs` and `stripe_events` tables. Each belongs to a later phase.
 
-**Before the first deploy:** the D1 database and R2 bucket named in `wrangler.jsonc` don't exist yet, and
-the database id there is a stand-in. Astro's Cloudflare adapter also asks for a KV store called `SESSION`
-on first deploy, which this app doesn't use; decide then whether to let it or switch it off.
+**On Cloudflare (MRK WP account) on 28 Nov 2026:** the D1 database `build-mrkwp` exists (Oceania) with
+its tables, and its id is in `wrangler.jsonc`. Nothing else exists there yet: the app has not been deployed.
+
+**Deploying** is done by Cloudflare from GitHub's `main` branch: build command `npm run build`, deploy
+command `npx wrangler deploy`, preview builds off. `.node-version` asks the builder for Node 24. Still to do:
+
+- Merge `1.0.0` into `main` and push it.
+- After the first deploy, Matt types four secrets into the worker's Settings → Variables and Secrets:
+  `BUILD_API_USER`, `BUILD_API_PASSWORD`, `WP_USER_AGENT`, and a new `SESSION_SECRET` (never change it
+  afterwards: saved links stop working until re-opened from the email).
+- Add the custom domain `build.mrkwp.com` to the worker. That is when emailed links start working.
+- New tables in a later version are added with `npx wrangler d1 migrations apply DB --remote`.
+
+**The picture store (R2) is left out for now.** R2 is not switched on in the MRK WP account, so the bucket
+could not be created and its entry was taken out of `wrangler.jsonc`. Matt switches R2 on in the dashboard
+before the designs phase; then create `build-mrkwp-pictures` and put the `PICTURES` entry back.
+
+Astro's Cloudflare adapter also asks for a KV store called `SESSION` on first deploy, which this app
+doesn't use. Not yet seen whether an automated deploy creates it by itself.
 
 **Decisions made while building, to confirm with Matt:**
 

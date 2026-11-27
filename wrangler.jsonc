@@ -7,18 +7,21 @@
   "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
   "assets": { "binding": "ASSETS", "directory": "./dist" },
   "observability": { "enabled": true },
-  // Not created on Cloudflare yet. The id below is a stand-in that only works locally;
-  // replace it with the real one when Matt says to create the database.
+  // Where mrkdevelopment.net answers. Not a secret. The secrets (service account, firewall user agent,
+  // SESSION_SECRET) are typed into the Cloudflare dashboard by Matt, never here.
+  "vars": { "BUILD_API_URL": "https://mrkdevelopment.net/wp-json/mrkwp/v1/build" },
+  // Created in the MRK WP account on 28 Nov 2026 (Oceania). The id is not a secret.
   "d1_databases": [
     {
       "binding": "DB",
       "database_name": "build-mrkwp",
-      "database_id": "00000000-0000-0000-0000-000000000000",
+      "database_id": "1cb70679-1439-46e8-871c-4c348f5330eb",
       "migrations_dir": "migrations"
     }
   ],
-  // Private bucket for design pictures. Not created yet, and not used until the designs phase.
-  "r2_buckets": [{ "binding": "PICTURES", "bucket_name": "build-mrkwp-pictures" }],
+  // The private store for design pictures (R2, binding PICTURES, bucket "build-mrkwp-pictures") is left
+  // out until the designs phase: R2 is not switched on in the MRK WP account yet, and a deploy that
+  // names a missing bucket fails.
   // Sends anything waiting in the outbox, once a minute.
   "triggers": { "crons": ["* * * * *"] },
   // "test" is only ever run on this computer (npm run dev:test), against the stand-in backend in
@@ -32,8 +35,7 @@
           "database_id": "00000000-0000-0000-0000-000000000001",
           "migrations_dir": "migrations"
         }
-      ],
-      "r2_buckets": [{ "binding": "PICTURES", "bucket_name": "build-mrkwp-pictures-test" }]
+      ]
     }
   }
 }
