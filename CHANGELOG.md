@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.1 (28 Nov 2026)
+
+- **The app now builds on Cloudflare.** The first build there stopped because the code check could not
+  find the names of the four secrets, which until now it read from a file that only exists on a
+  developer's computer. The names (never the values) are now listed in the code.
+
 ## 1.0.0 (28 Nov 2026)
 
 The first version that builds. The link in a client's confirm email now opens something.
