@@ -76,8 +76,10 @@ drops the code from the address and shows the holding screen at phone width.
 
 - New tables in a later version are added with `npx wrangler d1 migrations apply DB --remote`.
 
-**The picture store** `build-mrkwp-pictures` (R2, Oceania, no public address) also exists there and is
-named in `wrangler.jsonc` as `PICTURES`. Nothing uses it until the designs phase.
+**There is no picture store.** The R2 bucket made on 28 Nov 2026 was never used and Matt removed it the
+same day: design pictures are shown straight from mrkdevelopment.net's media library. `wrangler.jsonc`
+no longer names it. A deploy fails if the settings name a bucket that doesn't exist, so the line and the
+bucket have to go, or come back, together.
 
 Astro's Cloudflare adapter also asks for a KV store called `SESSION` on first deploy, which this app
 doesn't use. The first deploy created it by itself, as `build-mrkwp-session`. It stays empty.

@@ -85,7 +85,7 @@ All of it goes in `resources/` as the specification says (`client-notes.md`, `li
 
 - **Pictures.** Ten files: for each of the five designs, one `desktop` (1440 wide) and one `mobile`
   (390 wide, or 780), WebP, each under 600 KB. They go into the WordPress media library through the
-  connector. **No checksum is needed** (simplified by Matt, 28 Nov 2026); if the skill sends one it is
+  connector: `upload-build-image` takes `number`, `position`, `view` and the file as `data_base64`. **No checksum is needed** (simplified by Matt, 28 Nov 2026); if the skill sends one it is
   ignored.
 - **Text.** For each design: `position` (1 to 5), `name`, `idea` (one sentence) and `notes`. The client
   reads all three on their phone, under the pictures. Plain text, no HTML or markdown; write them for a

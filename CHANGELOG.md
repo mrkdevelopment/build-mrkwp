@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.1.3 (28 Nov 2026)
+
+Nothing a client sees has changed.
+
+- **The unused picture store is gone.** Design pictures will be shown straight from mrkdevelopment.net, so
+  the empty store on Cloudflare was removed and the app no longer asks for it.
+
 ## 1.1.2 (28 Nov 2026)
 
 Notes only; nothing a client sees has changed.

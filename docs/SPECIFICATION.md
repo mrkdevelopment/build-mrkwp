@@ -25,7 +25,7 @@ Built to take a second product later (a QR contact card at `/card/`) without rew
 | Code | This repository, `mrkdevelopment/build-mrkwp`, at its root | Its own project, versions and deploys. Its build must not need WordPress |
 | Framework | Astro with the Cloudflare adapter, pages rendered on request | The same framework and components as the main site. Check the adapter's current set-up against the Astro docs before starting; it has changed between versions |
 | Job data | Cloudflare D1 | The working copy of each job, and the outbox (section 4) |
-| Pictures | mrkdevelopment.net's media library | The ten design pictures per job, shown from their own addresses. The R2 store exists and is not used for now |
+| Pictures | mrkdevelopment.net's media library | The ten design pictures per job, shown from their own addresses. There is no R2 store: the unused one was removed on 28 Nov 2026 |
 | Secrets | Cloudflare secrets: `BUILD_API_URL`, `BUILD_API_USER`, `BUILD_API_PASSWORD`, `WP_USER_AGENT`, `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `ABN_LOOKUP_GUID`, `PAGESPEED_API_KEY` (optional), `SESSION_SECRET` | None in the repo |
 | Look | `DESIGN.md` in this repository (the main site's, copied 27 Nov 2026) and the logo files in `assets/brand/` | It should feel like the same business |
 
