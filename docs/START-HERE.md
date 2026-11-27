@@ -8,7 +8,7 @@ the state of play and should be updated as things change.
 
 | Piece | State on 27 Nov 2026 |
 |---|---|
-| **This app** | **Phase 1 built on branch `1.0.0`, running on this computer only** (see "Phase 1" below). Checked against a stand-in backend, and against the real job `RB-1001`, which it confirmed on 28 Nov 2026. Not deployed yet; its database exists on Cloudflare |
+| **This app** | **Phase 1 built as version `1.0.0` and merged into `main` on 28 Nov 2026; first deploy under way** (see "Phase 1" below). Checked against a stand-in backend, and against the real job `RB-1001`, which it confirmed on 28 Nov 2026. Not deployed yet; its database exists on Cloudflare |
 | **mrkdevelopment.net** (mrkwp-core 1.8.1) | **Live.** Sign-ups become numbered jobs, the client is emailed their private link, the builders are emailed. Three routes exist for this app (below). Tested with a real sign-up: job `RB-1001` |
 | **www.mrkwp.com sign-up form** | Not built. Until it is, sign-ups are made by posting to the rebuild webhook by hand |
 | **MRK-Web job mode** | Not built. Specified in the MRK-Web repository |

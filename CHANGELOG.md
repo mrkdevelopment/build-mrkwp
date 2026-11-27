@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.0.0 (in progress, started 27 Nov 2026)
+## 1.0.0 (28 Nov 2026)
 
 The first version that builds. The link in a client's confirm email now opens something.
 
