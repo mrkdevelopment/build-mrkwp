@@ -9,7 +9,7 @@ the state of play and should be updated as things change.
 | Piece | State on 27 Nov 2026 |
 |---|---|
 | **This app** | **Phase 1 is live at build.mrkwp.com (version 1.0.1, 28 Nov 2026)** (see "Phase 1" below). Checked against a stand-in backend, and against the real job `RB-1001`, which it confirmed on 28 Nov 2026. Not deployed yet; its database exists on Cloudflare |
-| **mrkdevelopment.net** (mrkwp-core 1.8.2) | **Live.** Sign-ups become numbered jobs, the client is emailed their private link, the builders are emailed. Three routes exist for this app (below). Tested with a real sign-up: job `RB-1001` |
+| **mrkdevelopment.net** (mrkwp-core 1.8.4) | **Live.** Sign-ups become numbered jobs, the client is emailed their private link, the builders are emailed. Three routes exist for this app (below). Tested with a real sign-up: job `RB-1001` |
 | **www.mrkwp.com sign-up form** | Not built. Until it is, sign-ups are made by posting to the rebuild webhook by hand |
 | **MRK-Web job mode** | Not built. Specified in the MRK-Web repository |
 
@@ -94,9 +94,9 @@ doesn't use. The first deploy created it by itself, as `build-mrkwp-session`. It
 - A job already held here has its link checked against the stored code, without asking mrkdevelopment.net.
 - A browser is signed in to one job at a time.
 
-## Phase 2: "Your business" (1.1.0 live on 28 Nov 2026; 1.1.1 built, not deployed)
+## Phase 2: "Your business" (live since 28 Nov 2026, version 1.1.1)
 
-A job at `confirmed` walks through these short screens. 1.1.1 (branch `1.1.1`) adds the phone and address
+A job at `confirmed` walks through these short screens. 1.1.1 added the phone and address
 boxes, Back on every step, and the summary screen.
 
 | Screen | What happens |
@@ -142,10 +142,16 @@ each button does), `src/products/rebuild/` (the screens), `migrations/0002_site_
 - **A strict content security policy** on every page (Astro's `security.csp`). It only applies to the built
   app, not under `npm run dev`.
 
-**Waiting on the backend.** mrkwp-core 1.8.2 doesn't take `details` or `goals` yet, so those answers wait in
-the outbox and are retried each hour. Until they are accepted, the copy here stays ahead of mrkdevelopment.net:
-a client sees "We're on it" while the master record still says `confirmed`, **and the builders are not told
-the job is ready.** Phase 2 should not go live for real clients until the backend takes both actions.
+**The backend takes these answers (mrkwp-core 1.8.4, live 28 Nov 2026).** `details` stores the business
+details and the check's result, and a fit of `no` moves the job to `not_a_fit`. `goals` stores the client's
+text, moves the job to `ready` and tells the builders. Both arrive within a second or two of "Start my
+designs". Checked with real job `RB-1002`: its two answers had waited in the outbox since 1.1.0, and both
+were accepted on the first try after the backend was updated. The backend keeps `business.name`, `phone`
+and `address` and `scan.client_corrections` as this app sends them.
+
+The backend answers 409 (`mrkwp_build_stage`) to `details` or `goals` for a job still at `signed_up`, and to
+`goals` for a job at `not_a_fit`. This app never sends either in those states, so the outbox has no special
+case for it: such a row would be retried and then flagged after a day.
 
 **Checked (28 Nov 2026):** 21 tests, including every check rule against made-up pages and a refusal to
 follow a redirect to a private address. In the local app against the stand-in backend: a mistyped address;
@@ -158,7 +164,11 @@ built app with the security policy on; every screen at phone width.
 mattonamission.com. The check ran in two seconds and found the name, logo, platform, page count, social
 pages, email and domain details. Both answers are waiting in the outbox for the backend.
 
-**Not checked:** the backend receiving the answers; 1.1.1 on the live site; a real client's site with a shop or members' area (those rules are tested
+**Checked on the live site (28 Nov 2026, 1.1.1):** test job `RB-1001` through every screen to the summary,
+with Back keeping what was typed and nothing sent before the last button.
+
+**Not checked:** a job going from "Start my designs" to the builders' email in one go; "needs a
+conversation" and its fifteen-minute report on the live site; a real client's site with a shop or members' area (those rules are tested
 with made-up pages only); the ABN look-up; a real phone.
 
 **New tables and deploying.** The three tables for 1.1.0 were added to the live database on 28 Nov 2026,
@@ -190,7 +200,9 @@ account's application password (Basic auth) and sends the firewall user agent.
 | Call | Needs | Answers |
 |---|---|---|
 | `GET /jobs/{number}` | `X-Job-Token: <code>` | 200 with the client's view of the job |
-| `PATCH /jobs/{number}` with `{"action":"confirm"}` | `X-Job-Token: <code>` | 200 with the job, now at `confirmed`. Safe to send twice. Any other action: 400 |
+| `PATCH /jobs/{number}` with `{"action":"confirm"}` | `X-Job-Token: <code>` | 200 with the job, now at `confirmed`. Safe to send twice |
+| `PATCH /jobs/{number}` with `{"action":"details", "business": {...}, "scan": {...}}` | `X-Job-Token: <code>` | 200 with the job (1.8.4). A scan with fit `no` moves it to `not_a_fit` |
+| `PATCH /jobs/{number}` with `{"action":"goals", "goals": "..."}` | `X-Job-Token: <code>` | 200 with the job, now at `ready` (1.8.4). Any other action: 400. A request with an `Idempotency-Key` already taken is answered again, not redone |
 | `POST /jobs` | The sign-up fields | 201 `{number, created: true}`, or 200 with `created: false` for someone who already has an open job. Never returns the code. This app has no reason to call it |
 
 Things to rely on:
@@ -228,7 +240,6 @@ built. **Ask Matt to have the backend piece built when this app reaches the phas
 
 | This app's phase | Backend piece it needs | Until then |
 |---|---|---|
-| Your business, the scans, What you want | `PATCH` actions `details` and `goals` | Save to D1 and leave the rows in the outbox. Nothing is lost; they send when the backend can take them |
 | Designs | The designs upload, the hook that tells this app a job changed, `edge-confirm` | Build against a made-up job in D1 with ten placeholder pictures in R2 |
 | Ranking and extras | `PATCH` actions `ranking` and `extras` | Outbox, as above |
 | Price | `GET /config` (the price table, care plans, booking link) | A config file in this repo with the same shape, marked as a stand-in |

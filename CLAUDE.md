@@ -23,7 +23,7 @@ They live in the mrkwp.com site repository, on branch `1.8.0` until it is merged
 - `REBUILD-SPEC-2-WEBSITE.md`: the sign-up form that sends people here.
 
 The backend plugin is at `~/Local Sites/mrkwp/app/public/wp-content/plugins/mrkwp-core` (branch
-`1.8.2`, live on mrkdevelopment.net). Read it to check how a route behaves; **do not change it from a
+`1.8.4`, live on mrkdevelopment.net). Read it to check how a route behaves; **do not change it from a
 session in this project**. Backend changes are asked of Matt and done in their own session.
 
 Do not copy those files into this repository. Two copies drift apart.
