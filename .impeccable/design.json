@@ -1,0 +1,455 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-12T00:00:00Z",
+  "title": "Design System: MRK WP",
+  "extensions": {
+    "colorMeta": {
+      "signal-blue": {
+        "role": "primary",
+        "displayName": "Signal Blue",
+        "tonalRamp": [
+          "#0B1A5C",
+          "#13289A",
+          "#1C3BD6",
+          "#2B59FF",
+          "#5B7FFF",
+          "#8FA7FF",
+          "#C4D1FF",
+          "#EEF2FF"
+        ]
+      },
+      "signal-blue-deep": {
+        "role": "primary",
+        "displayName": "Signal Blue Deep"
+      },
+      "deep-navy": {
+        "role": "secondary",
+        "displayName": "Deep Navy",
+        "tonalRamp": [
+          "#051322",
+          "#0A2540",
+          "#0E2F54",
+          "#153456",
+          "#123960",
+          "#3A5878",
+          "#8497AD",
+          "#DCE3EB"
+        ]
+      },
+      "navy-lift": {
+        "role": "secondary",
+        "displayName": "Navy Lift"
+      },
+      "glow-cyan": {
+        "role": "tertiary",
+        "displayName": "Glow Cyan",
+        "tonalRamp": [
+          "#003A47",
+          "#00627A",
+          "#008FB0",
+          "#00B8E0",
+          "#00D4FF",
+          "#5CE3FF",
+          "#A8F0FF",
+          "#E6FBFF"
+        ]
+      },
+      "fresh-teal": {
+        "role": "tertiary",
+        "displayName": "Fresh Teal",
+        "tonalRamp": [
+          "#00382F",
+          "#005E50",
+          "#008571",
+          "#00AD92",
+          "#00D4B2",
+          "#4DE3C9",
+          "#A3F0E2",
+          "#E3FBF6"
+        ]
+      },
+      "youtube-red": {
+        "role": "tertiary",
+        "displayName": "YouTube Red"
+      },
+      "paper": {
+        "role": "neutral",
+        "displayName": "Paper",
+        "tonalRamp": [
+          "#0F172A",
+          "#1E293B",
+          "#334155",
+          "#475569",
+          "#64748B",
+          "#CBD5E1",
+          "#E2E8F0",
+          "#F8FAFC"
+        ]
+      },
+      "surface": {
+        "role": "neutral",
+        "displayName": "Surface"
+      },
+      "wash": {
+        "role": "neutral",
+        "displayName": "Wash"
+      },
+      "hairline": {
+        "role": "neutral",
+        "displayName": "Hairline"
+      },
+      "hairline-strong": {
+        "role": "neutral",
+        "displayName": "Hairline Strong"
+      },
+      "ink-soft": {
+        "role": "neutral",
+        "displayName": "Ink Soft"
+      },
+      "ink-muted": {
+        "role": "neutral",
+        "displayName": "Ink Muted"
+      },
+      "ink-quiet": {
+        "role": "neutral",
+        "displayName": "Ink Quiet"
+      },
+      "fresh-teal-ink": {
+        "role": "tertiary",
+        "displayName": "Fresh Teal Ink"
+      }
+    },
+    "typographyMeta": {
+      "layered-display": {
+        "displayName": "Layered Display",
+        "purpose": "Anton 400 (font-condensed font-normal), line-height 0.9, tracking -0.005em, no wrapping, fitted to the column (capped at 21cqw). Only the two big lines of the Layered Header and the same lines in YouTube videos and Shorts: line 1 solid Deep Navy, line 2 white with a Signal Blue outline (max(1.25px, 0.012em)) and a soft light grey glow. The only preloaded font. Never used for body headings."
+      },
+      "display": {
+        "displayName": "Display",
+        "purpose": "Page and hero H1s, almost always two-tone. Space Grotesk (served at 600-700; font-extrabold renders at 700). 1.875rem mobile, 3rem sm, 3.75rem lg, line-height 1.1."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Section H2s, often two-tone. 1.5rem mobile to 2.25rem, line-height about 1.25."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Card and feature H3s, 700, 1.25rem."
+      },
+      "lead": {
+        "displayName": "Lead",
+        "purpose": "Intro paragraph under a page title, 1.125-1.25rem, line-height 1.625, max 42rem (max-w-2xl), Ink Muted."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "All running text, 1rem, line-height 1.65, Ink Muted on light surfaces. Article bodies use the Tailwind Typography prose styles."
+      },
+      "eyebrow": {
+        "displayName": "Eyebrow",
+        "purpose": "Outfit 700, 1rem, uppercase, 0.2em tracking, Signal Blue, above the H1 or a section heading."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Status badges and small tags: 0.75rem uppercase semibold, wide tracking."
+      },
+      "mono-note": {
+        "displayName": "Mono Note",
+        "purpose": "System monospace 700, 1rem, Signal Blue or Teal: one-line margin annotation at the top of a feature card, one per card at most."
+      }
+    },
+    "shadows": [
+      {
+        "name": "resting-hairline",
+        "value": "0 1px 2px 0 rgb(0 0 0 / 0.05)",
+        "purpose": "shadow-xs: cards, inputs, secondary buttons and logo tiles at rest."
+      },
+      {
+        "name": "hover-lift",
+        "value": "0 10px 15px -3px rgb(226 232 240 / 0.5), 0 4px 6px -4px rgb(226 232 240 / 0.5)",
+        "purpose": "Card Lift recipe: shadow-lg shadow-slate-200/50 with a 6px rise (-translate-y-1.5) and the border moving to Hairline Strong, 200ms."
+      },
+      {
+        "name": "button-rise",
+        "value": "0 14px 22px -10px var(--btn-rise-shadow, rgb(10 37 64 / 0.4)), 0 4px 8px -4px rgb(10 37 64 / 0.12)",
+        "purpose": "btn-rise hover/focus with a 3px lift; tint via --btn-rise-shadow (btn-rise-blue rgb(43 89 255 / 0.55), btn-rise-red rgb(220 38 38 / 0.5), navy default)."
+      },
+      {
+        "name": "button-press",
+        "value": "0 6px 12px -6px var(--btn-rise-shadow, rgb(10 37 64 / 0.4)), 0 2px 4px -2px rgb(10 37 64 / 0.1)",
+        "purpose": "btn-rise :active: settles to a 1px lift with this tighter shadow in 90ms."
+      },
+      {
+        "name": "text-float",
+        "value": "0 1px 1px rgb(0 0 0 / 0.35), 0 10px 22px rgb(0 0 0 / 0.45)",
+        "purpose": "Text raised off a 3D card (TiltCard layers at translate-z-[40px] to translate-z-[64px])."
+      },
+      {
+        "name": "layered-outline-glow",
+        "value": "0 0.03em 0.08em rgb(100 116 139 / 0.15), 0 0 0.22em rgb(148 163 184 / 0.18)",
+        "purpose": "text-shadow on the white, Signal Blue-outlined second line of the Layered Header (and the same line on video)."
+      },
+      {
+        "name": "cyan-glow",
+        "value": "0 0 24px rgba(0, 212, 255, 0.35)",
+        "purpose": "Glow Cyan glow, on navy only. Never on a light surface."
+      },
+      {
+        "name": "glow-dark",
+        "value": "radial-gradient(120% 80% at 100% 0%, rgba(0, 212, 255, 0.16), transparent 60%)",
+        "purpose": ".glow-dark::before wash on dark product panels (results tiles, flow diagrams)."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-out-expo",
+        "value": "cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Signature easing: reveals, card lifts, button rises, sheets, layer rise and motion graphics. Never linear."
+      },
+      {
+        "name": "ease-standard",
+        "value": "cubic-bezier(0.4, 0, 0.2, 1)",
+        "purpose": "Continuous transforms."
+      },
+      {
+        "name": "icon-glide",
+        "value": "180ms",
+        "purpose": "Trailing arrow nudges and icon moves; UI reveals stay within 180-240ms."
+      },
+      {
+        "name": "button-rise",
+        "value": "220ms",
+        "purpose": "btn-rise hover/focus lift; owns the transition (never combine with transition-*/duration-*)."
+      },
+      {
+        "name": "button-press",
+        "value": "90ms",
+        "purpose": "btn-rise :active settle to 1px."
+      },
+      {
+        "name": "card-hover",
+        "value": "200ms",
+        "purpose": "Card Lift: 6px rise, border shift, title to Signal Blue."
+      },
+      {
+        "name": "sheet",
+        "value": "350ms",
+        "purpose": "Drawers, sheets and scene changes."
+      },
+      {
+        "name": "stagger",
+        "value": "50ms (40-60ms)",
+        "purpose": "Per-item delay for sequenced entrances."
+      },
+      {
+        "name": "reveal-in",
+        "value": "550ms, 16px rise, 70ms stagger (capped at 280ms)",
+        "purpose": "One-time scroll reveal ([data-reveal], [data-reveal-stagger], [data-reveal-grid]), 768px and wider, no-preference motion only."
+      },
+      {
+        "name": "layer-rise",
+        "value": "900ms, 28px rise, per-layer --rise-delay",
+        "purpose": "LayeredHero layers rising into place on load; parallax ([data-parallax]) on an inner element; off for reduced motion."
+      },
+      {
+        "name": "tilt",
+        "value": "max 9deg per axis, perspective 1200px, 80ms tracking / 450ms reset, cubic-bezier(0.22, 1, 0.36, 1)",
+        "purpose": "TiltCard toward mouse or pen only (never touch); still under reduced motion."
+      },
+      {
+        "name": "layered-video-lines",
+        "value": "~560ms, line 2 80ms after line 1",
+        "purpose": "Layered Type on Video: lines rise in with the signature easing; no bounces or spins; each phrase holds at least 1s."
+      },
+      {
+        "name": "hyperframes",
+        "value": "60fps; reveal 12-18 frames; spring { stiffness: 260, damping: 20, mass: 1 }; card scale max 1.015",
+        "purpose": "Video and canvas motion graphics only; cards never scale on the web."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "sm",
+        "value": "640px"
+      },
+      {
+        "name": "md",
+        "value": "768px"
+      },
+      {
+        "name": "lg",
+        "value": "1024px"
+      },
+      {
+        "name": "xl",
+        "value": "1280px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "ButtonLink primary: Signal Blue fill, white bold 16px text, trailing 16px arrow-up-right, btn-rise btn-rise-blue. Sized to its label, never full width.",
+      "html": "<a class=\"ds-btn-primary\" href=\"#\">Work with me <svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M7 7h10v10\"/><path d=\"M7 17 17 7\"/></svg></a>",
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; gap: 8px; padding: 14px 24px; border-radius: 12px; background: #2B59FF; color: #fff; font-family: var(--font-body, Outfit, sans-serif); font-weight: 700; font-size: 16px; text-decoration: none; cursor: pointer; box-shadow: 0 10px 15px -3px rgb(43 89 255 / 0.25), 0 4px 6px -4px rgb(43 89 255 / 0.25); transition: translate 220ms cubic-bezier(0.16,1,0.3,1), box-shadow 220ms cubic-bezier(0.16,1,0.3,1), background-color 220ms cubic-bezier(0.16,1,0.3,1), border-color 220ms cubic-bezier(0.16,1,0.3,1), color 220ms cubic-bezier(0.16,1,0.3,1); } .ds-btn-primary:hover, .ds-btn-primary:focus-visible { background: #2047E0; } .ds-btn-primary:hover, .ds-btn-primary:focus-visible { translate: 0 -3px; box-shadow: 0 14px 22px -10px rgb(43 89 255 / 0.55), 0 4px 8px -4px rgb(10 37 64 / 0.12); outline: none; } .ds-btn-primary:active { translate: 0 -1px; box-shadow: 0 6px 12px -6px rgb(43 89 255 / 0.55), 0 2px 4px -2px rgb(10 37 64 / 0.1); transition-duration: 90ms; } @media (prefers-reduced-motion: reduce) { .ds-btn-primary:hover, .ds-btn-primary:focus-visible, .ds-btn-primary:active { translate: none; } }"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "ButtonLink secondary: white fill with a visible slate-300 border, Deep Navy semibold text; border tints toward Signal Blue on hover. Never a grey fill.",
+      "html": "<a class=\"ds-btn-secondary\" href=\"#\">Watch our videos</a>",
+      "css": ".ds-btn-secondary { display: inline-flex; align-items: center; gap: 8px; padding: 14px 24px; border-radius: 12px; background: rgb(255 255 255 / 0.9); backdrop-filter: blur(8px); color: #0A2540; border: 1px solid #CBD5E1; font-family: var(--font-body, Outfit, sans-serif); font-weight: 600; font-size: 16px; text-decoration: none; cursor: pointer; box-shadow: 0 4px 6px -1px rgb(203 213 225 / 0.4), 0 2px 4px -2px rgb(203 213 225 / 0.4); transition: translate 220ms cubic-bezier(0.16,1,0.3,1), box-shadow 220ms cubic-bezier(0.16,1,0.3,1), background-color 220ms cubic-bezier(0.16,1,0.3,1), border-color 220ms cubic-bezier(0.16,1,0.3,1), color 220ms cubic-bezier(0.16,1,0.3,1); } .ds-btn-secondary:hover, .ds-btn-secondary:focus-visible { background: #fff; border-color: rgb(43 89 255 / 0.4); } .ds-btn-secondary:hover, .ds-btn-secondary:focus-visible { translate: 0 -3px; box-shadow: 0 14px 22px -10px rgb(10 37 64 / 0.4), 0 4px 8px -4px rgb(10 37 64 / 0.12); outline: none; } .ds-btn-secondary:active { translate: 0 -1px; box-shadow: 0 6px 12px -6px rgb(10 37 64 / 0.4), 0 2px 4px -2px rgb(10 37 64 / 0.1); transition-duration: 90ms; } @media (prefers-reduced-motion: reduce) { .ds-btn-secondary:hover, .ds-btn-secondary:focus-visible, .ds-btn-secondary:active { translate: none; } }"
+    },
+    {
+      "name": "Dark-Card Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Button on a navy panel: white fill, Hairline border, Deep Navy bold text, Signal Blue icon, navy-tinted rise.",
+      "html": "<div class=\"ds-dark-wrap\"><a class=\"ds-btn-dark\" href=\"#\">Watch on YouTube <svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#2B59FF\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M7 7h10v10\"/><path d=\"M7 17 17 7\"/></svg></a></div>",
+      "css": ".ds-dark-wrap { display: inline-block; padding: 24px; border-radius: 24px; background: #0A2540; } .ds-btn-dark { display: inline-flex; align-items: center; gap: 8px; padding: 14px 24px; border-radius: 12px; background: #fff; color: #0A2540; border: 1px solid #E2E8F0; font-family: var(--font-body, Outfit, sans-serif); font-weight: 700; font-size: 16px; text-decoration: none; transition: translate 220ms cubic-bezier(0.16,1,0.3,1), box-shadow 220ms cubic-bezier(0.16,1,0.3,1), background-color 220ms cubic-bezier(0.16,1,0.3,1), border-color 220ms cubic-bezier(0.16,1,0.3,1), color 220ms cubic-bezier(0.16,1,0.3,1); } .ds-btn-dark:hover, .ds-btn-dark:focus-visible { background: #F1F5F9; } .ds-btn-dark:hover, .ds-btn-dark:focus-visible { translate: 0 -3px; box-shadow: 0 14px 22px -10px rgb(10 37 64 / 0.4), 0 4px 8px -4px rgb(10 37 64 / 0.12); outline: none; } .ds-btn-dark:active { translate: 0 -1px; box-shadow: 0 6px 12px -6px rgb(10 37 64 / 0.4), 0 2px 4px -2px rgb(10 37 64 / 0.1); transition-duration: 90ms; } @media (prefers-reduced-motion: reduce) { .ds-btn-dark:hover, .ds-btn-dark:focus-visible, .ds-btn-dark:active { translate: none; } }"
+    },
+    {
+      "name": "Text Input",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Form field (QuickEnquiry): white fill, slate-300 border, 12px radius, 16px text; optional leading 16px icon with 36px left padding; Signal Blue focus ring.",
+      "html": "<label class=\"ds-field\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#94A3B8\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><rect x=\"2\" y=\"4\" width=\"20\" height=\"16\" rx=\"2\"/><path d=\"m22 7-10 5L2 7\"/></svg><input class=\"ds-input\" type=\"email\" placeholder=\"you@company.com\"></label>",
+      "css": ".ds-field { position: relative; display: block; max-width: 360px; } .ds-field svg { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); } .ds-input { width: 100%; padding: 10px 14px 10px 36px; font-family: var(--font-body, Outfit, sans-serif); font-size: 16px; color: #0A2540; background: #fff; border: 1px solid #CBD5E1; border-radius: 12px; } .ds-input::placeholder { color: #94A3B8; } .ds-input:focus { outline: none; border-color: #2B59FF; box-shadow: 0 0 0 2px #2B59FF; }"
+    },
+    {
+      "name": "Navigation",
+      "kind": "nav",
+      "refersTo": "nav-link",
+      "description": "Sticky header (64px, 80px from md): white at 95% with blur, semibold 16px Ink Muted links 32px apart, Signal Blue hover and active pill underline, btn-rise CTA (10px x 20px).",
+      "html": "<nav class=\"ds-nav\"><span class=\"ds-brand\">MRK <b>WP</b></span><a href=\"#\" class=\"ds-nav-link is-active\">Home</a><a href=\"#\" class=\"ds-nav-link\">Articles</a><a href=\"#\" class=\"ds-nav-link\">Videos</a><a href=\"#\" class=\"ds-nav-link\">Tools</a><a href=\"#\" class=\"ds-nav-cta\">Work with me</a></nav>",
+      "css": ".ds-nav { display: flex; align-items: center; gap: 32px; height: 80px; padding: 0 24px; background: rgb(255 255 255 / 0.95); backdrop-filter: blur(12px); border-bottom: 1px solid rgb(226 232 240 / 0.8); font-family: var(--font-body, Outfit, sans-serif); } .ds-brand { font-family: var(--font-display, 'Space Grotesk', sans-serif); font-weight: 700; font-size: 18px; color: #0A2540; margin-right: auto; letter-spacing: -0.025em; } .ds-brand b { color: #2B59FF; font-weight: 700; } .ds-nav-link { position: relative; padding: 4px 0; font-size: 16px; font-weight: 600; color: #475569; text-decoration: none; transition: color 150ms; } .ds-nav-link:hover, .ds-nav-link:focus-visible { color: #2B59FF; outline: none; } .ds-nav-link.is-active { color: #2B59FF; } .ds-nav-link.is-active::after { content: ''; position: absolute; left: 0; right: 0; bottom: -2px; height: 2px; border-radius: 9999px; background: #2B59FF; } .ds-nav-cta { display: inline-flex; align-items: center; padding: 10px 20px; border-radius: 12px; background: #2B59FF; color: #fff; font-weight: 700; font-size: 16px; text-decoration: none; white-space: nowrap; box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05); transition: translate 220ms cubic-bezier(0.16,1,0.3,1), box-shadow 220ms cubic-bezier(0.16,1,0.3,1), background-color 220ms cubic-bezier(0.16,1,0.3,1), border-color 220ms cubic-bezier(0.16,1,0.3,1), color 220ms cubic-bezier(0.16,1,0.3,1); } .ds-nav-cta:hover, .ds-nav-cta:focus-visible { background: #2047E0; } .ds-nav-cta:hover, .ds-nav-cta:focus-visible { translate: 0 -3px; box-shadow: 0 14px 22px -10px rgb(43 89 255 / 0.55), 0 4px 8px -4px rgb(10 37 64 / 0.12); outline: none; } .ds-nav-cta:active { translate: 0 -1px; box-shadow: 0 6px 12px -6px rgb(43 89 255 / 0.55), 0 2px 4px -2px rgb(10 37 64 / 0.1); transition-duration: 90ms; } @media (prefers-reduced-motion: reduce) { .ds-nav-cta:hover, .ds-nav-cta:focus-visible, .ds-nav-cta:active { translate: none; } }"
+    },
+    {
+      "name": "Filter Chip",
+      "kind": "chip",
+      "refersTo": "chip",
+      "description": "Pill filter with count; selected inverts to navy.",
+      "html": "<div class=\"ds-chips\"><button class=\"ds-chip is-selected\">AI assistants <span>4</span></button><button class=\"ds-chip\">Development <span>15</span></button></div>",
+      "css": ".ds-chips { display: flex; gap: 8px; } .ds-chip { display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px; border-radius: 9999px; border: 1px solid #E2E8F0; background: #fff; color: #0A2540; font-family: var(--font-body, Outfit, sans-serif); font-size: 14px; font-weight: 600; cursor: pointer; transition: border-color 150ms, background-color 150ms; } .ds-chip span { padding: 0 6px; border-radius: 9999px; background: #F1F5F9; color: #64748B; font-size: 12px; } .ds-chip:hover, .ds-chip:focus-visible { border-color: #CBD5E1; outline: none; } .ds-chip.is-selected { background: #0A2540; border-color: #0A2540; color: #fff; } .ds-chip.is-selected span { background: rgb(255 255 255 / 0.15); color: #fff; }"
+    },
+    {
+      "name": "Tool Card",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "Tool card on the Card Lift recipe: logo well or monogram tile, status badge and price at the right, title and two-line summary, Hairline footer row with a Signal Blue label and nudging arrow. Whole card is the link.",
+      "html": "<article class=\"ds-card\"><div class=\"ds-card-top\"><span class=\"ds-mono-tile\">C</span><span class=\"ds-card-meta\"><span class=\"ds-badge\">Active</span><span class=\"ds-price\">$20/mo</span></span></div><h3>Claude Code</h3><p>Agentic CLI developer tool for deep codebase navigation and refactoring.</p><a class=\"ds-card-foot\" href=\"#\">View Specifications <svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M7 7h10v10\"/><path d=\"M7 17 17 7\"/></svg></a></article>",
+      "css": ".ds-card { max-width: 300px; padding: 24px; background: #fff; border: 1px solid rgb(226 232 240 / 0.9); border-radius: 16px; font-family: var(--font-body, Outfit, sans-serif); transition: all 200ms cubic-bezier(0.4,0,0.2,1); } .ds-card:hover { translate: 0 -6px; border-color: #CBD5E1; box-shadow: 0 10px 15px -3px rgb(226 232 240 / 0.5), 0 4px 6px -4px rgb(226 232 240 / 0.5); } .ds-card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 16px; } .ds-card-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; } .ds-mono-tile { width: 40px; height: 40px; display: grid; place-items: center; border-radius: 8px; background: linear-gradient(135deg, #EFF6FF, #EEF2FF); border: 1px solid #E2E8F0; color: #2B59FF; font-weight: 700; box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05); transition: transform 150ms; } .ds-card:hover .ds-mono-tile { transform: scale(1.05); } .ds-badge { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; padding: 2px 8px; border-radius: 6px; border: 1px solid #A7F3D0; background: #ECFDF5; color: #047857; } .ds-price { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; font-weight: 500; color: #64748B; } .ds-card h3 { margin: 0 0 6px; font-family: var(--font-display, 'Space Grotesk', sans-serif); font-size: 18px; font-weight: 700; color: #0A2540; letter-spacing: -0.025em; transition: color 150ms; } .ds-card:hover h3 { color: #2B59FF; } .ds-card p { margin: 0 0 20px; font-size: 16px; line-height: 1.625; color: #475569; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; } .ds-card-foot { display: flex; align-items: center; justify-content: space-between; padding-top: 12px; border-top: 1px solid #F1F5F9; font-size: 14px; font-weight: 600; color: #2B59FF; text-decoration: none; } .ds-card-foot svg { transition: transform 150ms; } .ds-card:hover .ds-card-foot svg { transform: translate(2px, -2px); } .ds-card-foot:focus-visible { outline: 2px solid #2B59FF; outline-offset: 4px; border-radius: 4px; }"
+    },
+    {
+      "name": "Pinned Page Panel",
+      "kind": "custom",
+      "refersTo": "card-dark",
+      "description": "Signature navy gradient panel for Matt, video and the timeline; the only home of Glow Cyan, 3D tilt (max 9deg, 1200px perspective) and dark backgrounds together.",
+      "html": "<div class=\"ds-pinned\"><div class=\"ds-pinned-eyebrow\">+ Less overwhelm</div><div class=\"ds-pinned-title\">More possibility.</div><div class=\"ds-pinned-meta\">Matt Knighton · Founder, MRK WP ↗</div></div>",
+      "css": ".ds-pinned { max-width: 320px; padding: 24px; border-radius: 24px; background: linear-gradient(135deg, #0A2540, #0E2F54, #0A2540); border: 1px solid rgb(43 89 255 / 0.2); box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1); font-family: var(--font-body, Outfit, sans-serif); color: #fff; transform-style: preserve-3d; transition: transform 450ms cubic-bezier(0.22,1,0.36,1); } .ds-pinned:hover { transform: perspective(1200px) rotateX(4deg) rotateY(-6deg); } .ds-pinned-eyebrow { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #00D4FF; } .ds-pinned-title { margin-top: 4px; font-size: 16px; font-weight: 700; transform: translateZ(40px); text-shadow: 0 1px 1px rgb(0 0 0 / .35), 0 10px 22px rgb(0 0 0 / .45); } .ds-pinned-meta { margin-top: 12px; font-size: 14px; color: #CBD5E1; } @media (prefers-reduced-motion: reduce) { .ds-pinned:hover { transform: none; } }"
+    },
+    {
+      "name": "Two-Tone Headline",
+      "kind": "custom",
+      "refersTo": "display",
+      "description": "Navy statement, Signal Blue payoff, with eyebrow.",
+      "html": "<div class=\"ds-head\"><p class=\"ds-eyebrow\">Educator. Community builder. Advisor.</p><h1>Useful tools.<br><span>Thoughtful choices.</span></h1></div>",
+      "css": ".ds-head { font-family: var(--font-body, Outfit, sans-serif); } .ds-eyebrow { margin: 0 0 12px; font-size: 16px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.2em; color: #2B59FF; } .ds-head h1 { margin: 0; font-family: var(--font-display, 'Space Grotesk', sans-serif); font-size: 44px; font-weight: 700; line-height: 1.1; letter-spacing: -0.025em; color: #0A2540; } .ds-head h1 span { color: #2B59FF; }"
+    },
+    {
+      "name": "Layered Header",
+      "kind": "custom",
+      "refersTo": "layered-display",
+      "description": "LayeredHero signature opener: intro line, then two huge Anton lines, solid Deep Navy over a white, Signal Blue-outlined line with a soft grey glow. One sentence, 1-3 words a line, both lines one size. Matt's cut-out stands in front of line 2 in the build.",
+      "html": "<div class=\"ds-layered\"><p class=\"ds-layered-intro\">Hi, I'm Matt.</p><h1 class=\"ds-layered-h\"><span class=\"ds-layered-1\">For agencies,</span><span class=\"ds-layered-2\">super-sub.</span></h1></div>",
+      "css": ".ds-layered { container-type: inline-size; max-width: 640px; padding: 24px; background: #F8FAFC; text-align: center; } .ds-layered-intro { margin: 0 0 8px; font-family: var(--font-body, Outfit, sans-serif); font-size: 18px; color: #475569; } .ds-layered-h { margin: 0; display: flex; flex-direction: column; font-family: var(--font-condensed, Anton, Impact, sans-serif); font-weight: 400; font-size: min(14cqw, 96px); line-height: 0.9; letter-spacing: -0.005em; } .ds-layered-1, .ds-layered-2 { display: block; white-space: nowrap; } .ds-layered-1 { color: #0A2540; } .ds-layered-2 { color: #fff; -webkit-text-stroke: max(1.25px, 0.012em) #2B59FF; text-shadow: 0 0.03em 0.08em rgb(100 116 139 / 0.15), 0 0 0.22em rgb(148 163 184 / 0.18); } @media (prefers-reduced-motion: no-preference) { .ds-layered-1, .ds-layered-2 { animation: ds-layer-rise 900ms cubic-bezier(0.16,1,0.3,1) both; } .ds-layered-2 { animation-delay: 80ms; } } @keyframes ds-layer-rise { from { opacity: 0; transform: translateY(28px); } }"
+    },
+    {
+      "name": "Brand Logos",
+      "kind": "custom",
+      "refersTo": "card",
+      "description": "About page only: a still grid of flat white logo tiles (12px radius, Hairline border, shadow-xs, 4.75rem tall), 3 columns, 4 from sm, 6 from lg, 12px gaps. No marquee, no script, no tilt.",
+      "html": "<ul class=\"ds-logos\"><li>Acme</li><li>Globex</li><li>Initech</li><li>Umbrella</li><li>Hooli</li><li>Stark</li></ul>",
+      "css": ".ds-logos { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; max-width: 720px; } @media (min-width: 640px) { .ds-logos { grid-template-columns: repeat(4, minmax(0, 1fr)); } } @media (min-width: 1024px) { .ds-logos { grid-template-columns: repeat(6, minmax(0, 1fr)); } } .ds-logos li { height: 4.75rem; display: flex; align-items: center; justify-content: center; padding: 0 12px; border-radius: 12px; background: #fff; border: 1px solid #E2E8F0; box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05); font-family: var(--font-display, 'Space Grotesk', sans-serif); font-weight: 700; color: #64748B; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Studio Notebook",
+    "overview": "The site reads like a well-kept working notebook from someone who has been building for the web for 25 years: structured like reference material, with clear headings, generous white space and cards you can scan. A few tactile, playful moments keep it lively. The page is pale slate paper. Deep navy carries the ink, and one bright Signal Blue marks what matters on each page: the second line of a headline, the active nav item, the main call to action. Dark navy panels act as the notebook's \"pinned\" pages. They hold Matt's portrait, video and the timeline, and that is where the cyan glow and the 3D tilt live.\n\nDensity is comfortable rather than tight. Body copy is set at a full 16px with a loose 1.65 line height. Sections breathe (64–96px apart), and every card has at least 24px of padding. The voice comes through annotation: wide-tracked uppercase eyebrows, small monospace notes (\"watch + learn\", \"↗ ▶ { }\"), and headlines split across two colours, plain statement first and blue payoff second.\n\nMotion is physical but polite. Buttons lift with a tinted shadow. Cards rise on hover. Content fades up once as it scrolls in, and the hero portrait tilts toward the pointer. Every one of these respects `prefers-reduced-motion`.",
+    "keyCharacteristics": [
+      "Pale slate paper, white cards, deep navy ink, one Signal Blue",
+      "Two-tone headlines: navy statement, blue payoff",
+      "Space Grotesk headings over Outfit body copy",
+      "Soft, generous corners (12–24px) and hairline slate borders",
+      "Navy \"pinned pages\" carry the glow, the 3D tilt and Matt's presence",
+      "Annotation voice: uppercase eyebrows and monospace margin notes"
+    ],
+    "rules": [
+      {
+        "name": "The One Signal Rule",
+        "body": "Signal Blue is the only saturated colour on a light surface that asks for attention. If something blue isn't a link, an action, an active state or the payoff half of a headline, it shouldn't be blue.",
+        "section": "colors"
+      },
+      {
+        "name": "The Glow Lives on Navy Rule",
+        "body": "Glow Cyan appears only on Deep Navy surfaces. On white it loses contrast and turns into decoration.",
+        "section": "colors"
+      },
+      {
+        "name": "The Seamless Paper Rule",
+        "body": "Every page and section sits on Paper (#F8FAFC); the header and the content share it with no seam. Pure white appears only inside a bordered container (a card, panel, input or sheet: `bg-white border border-slate-200/90 rounded-2xl`). Never a full-width white band without a border.",
+        "section": "colors"
+      },
+      {
+        "name": "The Ink Rule",
+        "body": "Any accent used as text on a light surface must reach 4.5:1. Teal text is Fresh Teal Ink, small labels are Ink Quiet (#64748B) or darker, never slate-400.",
+        "section": "colors"
+      },
+      {
+        "name": "The Two-Tone Headline Rule",
+        "body": "Big headlines state the plain fact in Deep Navy, then give the payoff in Signal Blue (\"Useful tools. **Thoughtful choices.**\"). Use one blue span per headline, at the end.",
+        "section": "typography"
+      },
+      {
+        "name": "The 16px Floor Rule",
+        "body": "Running text, buttons and nav are never smaller than 1rem. Only badges, prices and metadata drop to 0.75–0.875rem.",
+        "section": "typography"
+      },
+      {
+        "name": "The Earned Lift Rule",
+        "body": "Nothing floats until the visitor reaches for it. Resting surfaces stay flat. Lift and shadow mean \"this responds to you\".",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do build every new page inside the 72rem container with the shared gutters (16/24/32px), and open inner pages with the `page-intro` block.",
+      "Do write H1s and major H2s as two-tone headlines: a Deep Navy statement, then a Signal Blue payoff.",
+      "Do use `btn-rise` plus the right tint (`btn-rise-blue`, `btn-rise-red`) on every call-to-action button instead of `transition-all` or scale-on-press.",
+      "Do keep cards white on Paper with a 1px Hairline border and 24px padding, and let hover alone add lift.",
+      "Do reserve navy panels for Matt, video and the timeline, and keep Glow Cyan inside them.",
+      "Do honour `prefers-reduced-motion` for every new animation or tilt.",
+      "Do size buttons to their label (`self-start` in flex columns).",
+      "Do keep pages plain HTML: small interactions go in `src/scripts/enhance.ts`; a React island only for something that truly needs it (a form with live state, a checkout), hydrated when scrolled to."
+    ],
+    "donts": [
+      "Don't add a second saturated attention colour on light surfaces. Signal Blue is the only one; Teal stays a small mark.",
+      "Don't put Glow Cyan text on white or Paper.",
+      "Don't set running text, buttons or nav below 16px.",
+      "Don't hard-code new hex values in components. Reference these tokens. (The code currently repeats `#2B59FF` and `#0A2540` inline; new work should move toward the `@theme` variables, not add more copies.)",
+      "Don't give resting cards large shadows or sharp (0–4px) corners. Depth is earned on hover, and corners stay soft.",
+      "Don't use YouTube Red for anything that isn't a YouTube action.",
+      "Don't put gradients on icons or icon wells (no blue-to-cyan fills, no coloured glows behind an icon). Icon wells are one flat tint; see Icon Wells.",
+      "Don't split article content into columns. Inside the article body (posts, case study stories, WordPress content), lists, points and comparisons run in a single column, one item under the next: no card grids, no two-column lists, no side-by-side comparison cards. Number tiles in a stat panel are the one exception.",
+      "Don't give cards a coloured accent border on one side (top or left stripe). A card gets the 1px Hairline border all round, nothing more.",
+      "Don't use a full-width white band without a border. White lives inside bordered containers.",
+      "Don't give cards a blue border or outline on hover, or scale web cards.",
+      "Don't use `active:scale-*` on buttons, or `transition-*` / `duration-*` alongside `btn-rise`.",
+      "Don't make a button full width (`w-full`, or `items-stretch` on a stacking row), or give a secondary button a grey fill.",
+      "Don't put share, YouTube or \"visit\" buttons in a detail page's header.",
+      "Don't write `translate-z-40` on a TiltCard layer; use `translate-z-[40px]`.",
+      "Don't invent a new visual variation for a list or set of points when an existing block will do. Fewer variations keep articles calm and consistent."
+    ]
+  }
+}
