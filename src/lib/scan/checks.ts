@@ -245,6 +245,7 @@ const NETWORKS: [string, RegExp][] = [
   ['Pinterest', /(?:^|\.)pinterest\.com(?:\.au)?$/i],
 ];
 const SHARE_LINK = /\/(?:sharer|share|intent|dialog|plugins|tr|hashtag|search|login|policies|help|legal|privacy|terms)\b|shareArticle|[?&](?:u|url|text)=/i;
+// (`?id=` on a Facebook profile link is not a share link: see socialOf.)
 
 export function socialOf(raw: string): Social | null {
   let url: URL;
@@ -256,7 +257,10 @@ export function socialOf(raw: string): Social | null {
   if (url.protocol !== 'https:' && url.protocol !== 'http:') return null;
   const network = NETWORKS.find(([, host]) => host.test(url.hostname))?.[0];
   if (!network || SHARE_LINK.test(url.pathname + url.search) || url.pathname.replace(/\/+$/, '') === '') return null;
-  return { network, url: `https://${url.hostname.toLowerCase()}${url.pathname.replace(/\/+$/, '')}`.slice(0, 200) };
+  // Facebook pages without a custom name are told apart only by `?id=`, so that part is kept.
+  const id = /^\/profile\.php$/i.test(url.pathname) ? url.searchParams.get('id') : null;
+  if (/^\/profile\.php$/i.test(url.pathname) && !/^\d{5,20}$/.test(id ?? '')) return null;
+  return { network, url: `https://${url.hostname.toLowerCase()}${url.pathname.replace(/\/+$/, '')}${id ? `?id=${id}` : ''}`.slice(0, 200) };
 }
 
 const ORG_TYPES = /Organization|LocalBusiness|Corporation|Store|Service|Professional|Business|Restaurant|Dentist|Physician|Plumber|Electrician|Contractor|Agent|Salon|Clinic/;

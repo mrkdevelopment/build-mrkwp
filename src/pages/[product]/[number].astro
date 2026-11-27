@@ -5,7 +5,7 @@ import Heading from '../../components/Heading.astro';
 import KeepTyping from '../../components/KeepTyping.astro';
 import Layout from '../../layouts/Layout.astro';
 import { draftFor } from '../../lib/business-actions.ts';
-import { screenFor, type Draft, type Screen } from '../../lib/business.ts';
+import { homeOf, screenFor, summaryRows, type Draft, type Screen } from '../../lib/business.ts';
 import { openJob } from '../../lib/open-job.ts';
 import { getJob, latestRun, type ScanRunRow } from '../../lib/store.ts';
 import Address from '../../products/rebuild/Address.astro';
@@ -14,6 +14,7 @@ import Found from '../../products/rebuild/Found.astro';
 import Missed from '../../products/rebuild/Missed.astro';
 import NotAFit from '../../products/rebuild/NotAFit.astro';
 import { STAGES, STEPS, UNKNOWN_STAGE } from '../../products/rebuild/stages.ts';
+import Summary from '../../products/rebuild/Summary.astro';
 import Wants from '../../products/rebuild/Wants.astro';
 import Welcome from '../../products/rebuild/Welcome.astro';
 
@@ -46,7 +47,9 @@ if (job && screen?.screen === 'business') {
   }
 }
 const here = job ? `/${job.product}/${job.number}` : '/';
-const read = run?.result ? (JSON.parse(run.result) as { reachable?: boolean }).reachable !== false : true;
+const result = run?.result ? (JSON.parse(run.result) as { reachable?: boolean; final_url?: string }) : null;
+const read = result ? result.reachable !== false : true;
+const website = homeOf(result?.final_url || run?.address || draft?.address || '');
 ---
 
 {
@@ -55,10 +58,12 @@ const read = run?.result ? (JSON.parse(run.result) as { reachable?: boolean }).r
       {screen.screen === 'welcome' && <Welcome firstName={job.first_name} />}
       {screen.screen === 'not_a_fit' && <NotAFit scan={job.scan} jobNumber={job.number} />}
       {draft && step === 'address' && <Address address={draft.address} note={draft.note} />}
+      {draft && step === 'not_fit' && <NotAFit scan={result} jobNumber={job.number} canGoBack address={website} />}
       {draft && step === 'checking' && <Checking address={run?.address ?? draft.address} here={here} />}
       {draft && step === 'found' && <Found lines={draft.lines} error={draft.error} read={read} />}
       {draft && step === 'missed' && <Missed draft={draft} />}
       {draft && step === 'wants' && <Wants goals={draft.goals} />}
+      {draft && step === 'summary' && <Summary rows={summaryRows(draft, website)} technical={draft.lines.filter((line) => line.group === 'builders' && !line.removed).length} />}
       {draft && (step === 'missed' || step === 'wants') && <KeepTyping />}
       {screen.screen === 'message' && (
         <>

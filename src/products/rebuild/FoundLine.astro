@@ -1,6 +1,11 @@
 ---
-// One thing the check found, with "Change" and "Remove". No script: the fold-out is an ordinary
-// <details>, and each button is its own small form.
+// One thing the check found. The value sits on the left and its one action on the right, the same
+// way the summary screen lays its rows out.
+//
+// A line that can be edited is a fold-out: pressing "Change" swaps the value for a text box in the
+// same place, with Save, and Remove where that makes sense. A line that can't be edited has a single
+// Remove button, and a removed line can be put back. No script: the fold-out is an ordinary
+// <details>, and every button belongs to a small form.
 import type { Line } from '../../lib/business.ts';
 
 interface Props {
@@ -8,53 +13,78 @@ interface Props {
 }
 const { line } = Astro.props;
 const shortLink = (value: string): string => value.replace(/^https?:\/\/(www\.)?/i, '');
+const id = line.key.replace(/[^a-z0-9]+/gi, '-').toLowerCase();
+const removable = line.key !== 'name';
 ---
 
-<div>
-  <p class="text-sm font-semibold text-slate-600">{line.label}</p>
-  {line.removed ? (
-    <div class="mt-1 flex flex-wrap items-center justify-between gap-3">
-      <p class="text-slate-500"><s>{line.kind === 'link' ? shortLink(line.value) : line.kind === 'logo' ? 'Logo' : line.value}</s> <span class="font-semibold">Removed</span></p>
-      <form method="post" action="/api/job/business">
+{
+  line.removed ? (
+    <div class="flex items-center justify-between gap-4">
+      <div class="min-w-0">
+        <p class="text-sm font-semibold text-slate-600">{line.label}</p>
+        <p class="mt-1 break-words text-slate-500">
+          <s>{line.kind === 'link' ? shortLink(line.value) : line.kind === 'logo' ? 'Logo' : line.value}</s> <span class="font-semibold">Removed</span>
+        </p>
+      </div>
+      <form method="post" action="/api/job/business" class="shrink-0">
         <input type="hidden" name="do" value="restore" />
         <input type="hidden" name="key" value={line.key} />
-        <button type="submit" class="line-button">Put back</button>
+        <button type="submit" class="line-button" aria-label={`Put back ${line.label}`}>Put back</button>
       </form>
     </div>
-  ) : (
-    <>
-      <div class="mt-1 text-lg font-semibold break-words text-navy">
-        {line.kind === 'logo' && <img src={line.value} alt="Your logo" loading="lazy" referrerpolicy="no-referrer" class="max-h-16 max-w-[12rem] rounded bg-slate-100 object-contain p-1" />}
-        {line.kind === 'colour' && (
-          <span class="inline-flex items-center gap-2">
-            <svg width="28" height="28" viewBox="0 0 28 28" aria-hidden="true"><rect width="28" height="28" rx="6" fill={line.value} stroke="#cbd5e1" /></svg>
-            <span class="font-mono text-base">{line.value}</span>
+  ) : line.editable ? (
+    <details class="group">
+      <summary class="flex cursor-pointer list-none items-center justify-between gap-4 rounded-lg [&::-webkit-details-marker]:hidden">
+        <span class="block min-w-0">
+          <span class="block text-sm font-semibold text-slate-600">{line.label}</span>
+          <span class="mt-1 block text-lg font-semibold break-words text-navy group-open:hidden">
+            {line.kind === 'link' ? shortLink(line.value) : line.value || <span class="font-normal text-slate-500">We couldn't find this</span>}
           </span>
-        )}
-        {line.kind === 'link' && shortLink(line.value)}
-        {line.kind === 'text' && (line.value || <span class="font-normal text-slate-500">We couldn't find this</span>)}
-      </div>
-      <details class="mt-2">
-        <summary class="line-button inline-block cursor-pointer">{line.editable ? (line.value ? 'Change' : 'Add') : 'Not right?'}</summary>
-        <div class="mt-3 space-y-3">
-          {line.editable && (
-            <form method="post" action="/api/job/business">
-              <input type="hidden" name="do" value="change" />
-              <input type="hidden" name="key" value={line.key} />
-              <label class="block text-sm font-semibold text-navy" for={`change-${line.key}`}>{line.label}</label>
-              <input id={`change-${line.key}`} name="value" type="text" value={line.value} maxlength="200" autocapitalize={line.kind === 'link' ? 'none' : undefined} class="field mt-1" />
-              <button type="submit" class="btn-secondary mt-3">Save</button>
-            </form>
-          )}
-          {line.key !== 'name' && (
-            <form method="post" action="/api/job/business">
-              <input type="hidden" name="do" value="remove" />
-              <input type="hidden" name="key" value={line.key} />
-              <button type="submit" class="line-button">{line.editable ? "We don't have one. Remove it" : "That's wrong. Remove it"}</button>
-            </form>
-          )}
+        </span>
+        <span class="line-button shrink-0">
+          <span class="group-open:hidden">{line.value ? 'Change' : 'Add'}</span>
+          <span class="hidden group-open:inline">Cancel</span>
+        </span>
+      </summary>
+      <form method="post" action="/api/job/business" class="mt-2">
+        <input type="hidden" name="do" value="change" />
+        <input type="hidden" name="key" value={line.key} />
+        <label class="sr-only" for={`change-${id}`}>{line.label}</label>
+        <input id={`change-${id}`} name="value" type="text" value={line.value} maxlength="200" autocapitalize={line.kind === 'link' ? 'none' : undefined} class="field" />
+        <div class="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2">
+          <button type="submit" class="btn-small">Save</button>
+          {removable && <button type="submit" form={`remove-${id}`} class="back-button">Remove it</button>}
         </div>
-      </details>
-    </>
-  )}
-</div>
+      </form>
+      {
+        removable && (
+          <form id={`remove-${id}`} method="post" action="/api/job/business">
+            <input type="hidden" name="do" value="remove" />
+            <input type="hidden" name="key" value={line.key} />
+          </form>
+        )
+      }
+    </details>
+  ) : (
+    <div class="flex items-center justify-between gap-4">
+      <div class="min-w-0">
+        <p class="text-sm font-semibold text-slate-600">{line.label}</p>
+        <div class="mt-1 text-lg font-semibold break-words text-navy">
+          {line.kind === 'logo' && <img src={line.value} alt="Your logo" loading="lazy" referrerpolicy="no-referrer" class="max-h-14 max-w-[10rem] rounded bg-slate-100 object-contain p-1" />}
+          {line.kind === 'colour' && (
+            <span class="inline-flex items-center gap-2">
+              <svg width="28" height="28" viewBox="0 0 28 28" aria-hidden="true"><rect width="28" height="28" rx="6" fill={line.value} stroke="#cbd5e1" /></svg>
+              <span class="font-mono text-base">{line.value}</span>
+            </span>
+          )}
+          {line.kind !== 'logo' && line.kind !== 'colour' && line.value}
+        </div>
+      </div>
+      <form method="post" action="/api/job/business" class="shrink-0">
+        <input type="hidden" name="do" value="remove" />
+        <input type="hidden" name="key" value={line.key} />
+        <button type="submit" class="line-button" aria-label={`Remove ${line.label}: it's wrong`}>Remove</button>
+      </form>
+    </div>
+  )
+}

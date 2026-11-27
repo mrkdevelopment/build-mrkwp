@@ -1,7 +1,7 @@
 ---
 // "Anything we missed?": only what the check didn't find, all of it optional.
 import Heading from '../../components/Heading.astro';
-import { ASKED_NETWORKS, type Draft } from '../../lib/business.ts';
+import { ASKED_NETWORKS, kept, type Draft } from '../../lib/business.ts';
 
 interface Props {
   draft: Draft;
@@ -9,6 +9,9 @@ interface Props {
 const { draft } = Astro.props;
 const found = new Set(draft.lines.filter((line) => line.key.startsWith('social:') && !line.removed).map((line) => line.label));
 const networks = ASKED_NETWORKS.filter((network) => !found.has(network));
+// Phone and address are asked for only when the check didn't find them (or the client removed what it found).
+const askPhone = !kept(draft, 'phone');
+const askAddress = !kept(draft, 'address');
 ---
 
 <Heading plain="Anything" payoff="we missed?" />
@@ -16,7 +19,24 @@ const networks = ASKED_NETWORKS.filter((network) => !found.has(network));
 {draft.error && <p role="alert" class="mt-5 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 leading-relaxed text-amber-900">{draft.error}</p>}
 
 <form method="post" action="/api/job/business" class="mt-6 space-y-6" data-keep>
-  <input type="hidden" name="do" value="missed" />
+  {
+    askPhone && (
+      <div>
+        <label for="phone" class="block font-semibold text-navy">Business phone <span class="font-normal text-slate-600">(optional)</span></label>
+        <p id="phone-help" class="mt-1 text-sm leading-relaxed text-slate-600">The number customers should call.</p>
+        <input id="phone" name="phone" type="tel" autocomplete="tel" maxlength="30" value={draft.phone} aria-describedby="phone-help" class="field mt-2" />
+      </div>
+    )
+  }
+  {
+    askAddress && (
+      <div>
+        <label for="postal" class="block font-semibold text-navy">Business address <span class="font-normal text-slate-600">(optional)</span></label>
+        <p id="postal-help" class="mt-1 text-sm leading-relaxed text-slate-600">Where customers visit you. Work from home or travel to customers? Just put your town or the area you cover.</p>
+        <input id="postal" name="postal" type="text" autocomplete="street-address" maxlength="200" value={draft.postal} aria-describedby="postal-help" class="field mt-2" />
+      </div>
+    )
+  }
   <div>
     <label for="abn" class="block font-semibold text-navy">ABN <span class="font-normal text-slate-600">(optional)</span></label>
     <input id="abn" name="abn" type="text" inputmode="numeric" autocomplete="off" maxlength="20" value={draft.abn} placeholder="11 digits" class="field mt-2" />
@@ -34,5 +54,12 @@ const networks = ASKED_NETWORKS.filter((network) => !found.has(network));
       </div>
     ))
   }
-  <button type="submit" class="btn-primary">Next <span aria-hidden="true">→</span></button>
+  {/*
+    Back on the left, Next on the right. Next comes first in the page so the Enter key presses it;
+    the row is shown in reverse. Back carries what was typed, so it is kept.
+  */}
+  <div class="step-buttons flex-row-reverse">
+    <button type="submit" name="do" value="missed" class="btn-primary">Next <span aria-hidden="true">→</span></button>
+    <button type="submit" name="do" value="back" formnovalidate class="btn-secondary"><span aria-hidden="true">←</span> Back</button>
+  </div>
 </form>
