@@ -57,8 +57,7 @@ the look there.
 a real phone; the Welcome screen and Start on the live site (needs a new sign-up, since `RB-1001` is
 already confirmed); the live one-minute schedule sending something that had to wait.
 
-**Not built yet, on purpose:** the hook,
-the daily check, and the `scan_runs` and `stripe_events` tables. Each belongs to a later phase.
+**Not built yet, on purpose:** the daily check, and the `scan_runs` and `stripe_events` tables. Each belongs to a later phase.
 
 **On Cloudflare (MRK WP account) on 28 Nov 2026:** the D1 database `build-mrkwp` exists (Oceania) with
 its tables, and its id is in `wrangler.jsonc`. The app was first deployed on 28 Nov 2026.
@@ -240,17 +239,15 @@ built. **Ask Matt to have the backend piece built when this app reaches the phas
 
 | This app's phase | Backend piece it needs | Until then |
 |---|---|---|
-| Designs | The designs upload, the hook that tells this app a job changed, `edge-confirm` | Build against a made-up job in D1 with ten placeholder pictures in R2 |
+| Designs | The designs upload (mrkwp-core 1.8.5): a job at `designs_ready` then carries five designs | Build against a made-up job in D1 whose pictures are ordinary web addresses |
 | Ranking and extras | `PATCH` actions `ranking` and `extras` | Outbox, as above |
 | Price | `GET /config` (the price table, care plans, booking link) | A config file in this repo with the same shape, marked as a stand-in |
 | Payment | `POST /jobs/{number}/payment` | Stripe test mode end to end; the outbox holds the report |
 | Demo and approval | `PATCH` actions `approve` and `request_changes`; the `demo` fields | Made-up job |
 | Lost link | `POST /jobs/resend-link` | Leave the box out |
 
-**The hook isn't built, so pull.** Section 4 of the specification has mrkdevelopment.net telling this app
-when a job changes. Until that exists, the app fetches the job itself: on a client's first visit, and
-again on any later visit when its copy is more than a minute old. Keep that pull as a permanent fallback
-after the hook exists.
+**The app pulls; there is no hook** (decided 28 Nov 2026). The app fetches the job itself: on a client's first visit, and
+again on any later visit when its copy is more than a minute old. mrkdevelopment.net sends this app nothing.
 
 **The outbox must cope with "not built yet".** A `PATCH` the backend doesn't know answers 400 today. Treat
 400 with the code `mrkwp_build_action` as "try again later", not as a failure to show the client, and
@@ -280,7 +277,8 @@ job to `confirmed`; a wrong code shows the "isn't right" page; another job's num
 shows nothing; and with mrkdevelopment.net unreachable, a job already opened still opens.
 
 Phase 2, "Your business" and the scans, is built: see the section above. Next is phase 3, the designs,
-which needs the backend's designs upload and hook (see "What the backend does not offer yet").
+which needs the backend's designs upload (see "What the backend does not offer yet"). Read
+`docs/briefs/DESIGNS-1-MRKWP-CORE.md` first: the designs step was simplified on 28 Nov 2026.
 
 ## Small things that will save time
 

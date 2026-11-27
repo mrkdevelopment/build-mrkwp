@@ -84,15 +84,15 @@ All of it goes in `resources/` as the specification says (`client-notes.md`, `li
 ## Where it meets the other two systems
 
 - **Pictures.** Ten files: for each of the five designs, one `desktop` (1440 wide) and one `mobile`
-  (390 wide, or 780), WebP, each under 600 KB. Each upload carries its SHA-256. The backend checks it,
-  and build.mrkwp.com checks the same value again when it fetches the picture, so the checksum must be
-  of the exact bytes sent.
+  (390 wide, or 780), WebP, each under 600 KB. They go into the WordPress media library through the
+  connector. **No checksum is needed** (simplified by Matt, 28 Nov 2026); if the skill sends one it is
+  ignored.
 - **Text.** For each design: `position` (1 to 5), `name`, `idea` (one sentence) and `notes`. The client
   reads all three on their phone, under the pictures. Plain text, no HTML or markdown; write them for a
   business owner, not a designer.
-- **After the submit** the job is `designs_received`. The client is told nothing yet:
-  build.mrkwp.com fetches and checks the ten pictures first, and only then does the client get their
-  message. The skill does not wait for that and does not need to know about it.
+- **After the submit** the job is `designs_ready` and the client is told straight away: there is no
+  checking step in between (simplified by Matt, 28 Nov 2026). So look at the ten pictures before
+  submitting, because the client's message goes out when you do.
 - **Picture height.** The client sees each pair side by side and can open one full size. The first
   screen and the second section is the right amount, as the specification says; a very tall picture
   costs the 600 KB limit and nobody scrolls it on a phone.
@@ -105,7 +105,7 @@ From the specification's list, the lines that apply now:
   there answers with the one sentence.
 - An unclaimed job, and a job claimed by the other person, both stop with the right sentence.
 - `RB-1002`, claimed, runs to five designs with no question asked; ten pictures arrive on the job in
-  WordPress; the job is `designs_received`.
+  WordPress; the job is `designs_ready`.
 - Cutting the network during the uploads leaves the job `designing`, and running the command again
   finishes it without redrawing the designs.
 - A job number with text pasted after it ignores the text.

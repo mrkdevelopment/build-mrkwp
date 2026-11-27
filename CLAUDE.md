@@ -18,7 +18,7 @@ They live in the mrkwp.com site repository, on branch `1.8.0` until it is merged
 
 - `REBUILD-WORKFLOW-PLAN.md`: the whole service, step by step (A1 to E10), and which system does what.
 - `REBUILD-SPEC-1-MRKWP-CORE.md`: the WordPress side. Section 2 is the list of stages; section 4 is the
-  routes this app calls and the hook it receives. **That file is the contract. If this app needs a route
+  routes this app calls. **That file is the contract. If this app needs a route
   changed, change it there first.**
 - `REBUILD-SPEC-2-WEBSITE.md`: the sign-up form that sends people here.
 
@@ -33,8 +33,8 @@ Do not copy those files into this repository. Two copies drift apart.
 | Decision | Detail |
 |---|---|
 | Address | `build.mrkwp.com`. Each product has its own path and job numbers: `/rebuild/` with `RB-1042` now; `/card/` with `QR-0007` later for the QR contact card |
-| Master record | mrkdevelopment.net (mrkwp-core). This app holds a working copy on Cloudflare (D1 for job details, R2 for pictures) |
-| Designs | mrkdevelopment.net says a job has designs; this app fetches the five designs and ten pictures, checks them, and confirms. The client is only told after that confirmation |
+| Master record | mrkdevelopment.net (mrkwp-core). This app holds a working copy of job details on Cloudflare (D1) |
+| Designs (28 Nov 2026, replaces the earlier plan) | **Keep it simple.** The skill puts ten pictures in the WordPress media library and submits five designs; the job goes straight to `designs_ready`. This app asks WordPress for the job and shows the pictures from their media-library addresses. **No hook from WordPress, no shared secret, no checksums, no `edge-confirm`, no copying pictures into R2.** Matt rejected all of that as over-built: do not bring it back without asking him |
 | Client's answers | Saved here first, then sent on to mrkdevelopment.net and re-sent until accepted |
 | Sign-in | The link from the email: job number plus a private code. No passwords |
 | Site checks | Plain requests and pattern matching. No AI, no browser automation |
