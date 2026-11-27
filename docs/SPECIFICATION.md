@@ -1,7 +1,8 @@
 # Specification: the build.mrkwp.com app
 
 Written 27 Nov 2026. Moved here from the mrkwp.com site repository the same day, when this project got
-its own repository. It is the third of three specifications for the website rebuild service. The other
+its own repository. **Read `START-HERE.md` first**: it says which parts of the backend exist today. This
+is the third of three specifications for the website rebuild service. The other
 two, and the whole workflow step by step, are in the site repository (see `CLAUDE.md` for where):
 
 - `REBUILD-WORKFLOW-PLAN.md`: this app covers steps B1 to B7, C7, D1 to D8 and E6 there.
@@ -81,6 +82,10 @@ Rules for every screen:
   ordinary selects, not drag and drop.
 
 ## 4. Keeping in step with mrkdevelopment.net
+
+**Until the hook below exists on the backend, the app pulls**: it fetches a job on the client's first
+visit and again on any later visit when its copy is more than a minute old. Keep that as a fallback
+afterwards.
 
 **Coming in.** mrkdevelopment.net posts `{number, event, at}` to `/api/hooks/job`, signed with HMAC
 SHA-256 using `HOOK_SECRET`. The worker:

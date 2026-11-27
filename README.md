@@ -5,12 +5,13 @@ website rebuild they tell us about their business, see what our checks found, vi
 designs, choose extras, pay through Stripe, view their demo and approve it.
 
 Nothing is built yet. This repository holds the specification, the design system and the logo files,
-ready for the build to start.
+ready for the build to start. `docs/START-HERE.md` says what exists today and what to build first.
 
 ## What's here
 
 | Path | What |
 |---|---|
+| `docs/START-HERE.md` | The state of play: what the backend offers today, what is waiting, and the first phase to build |
 | `docs/SPECIFICATION.md` | What to build: every screen, the site checks, payment, sign-in, the installable app set-up, and the order to build it in |
 | `DESIGN.md` | The MRK WP design system: colours, type, components. Copied from the mrkwp.com site on 27 Nov 2026 |
 | `.impeccable/design.json` | The same design system in the form the design tools read |
@@ -31,5 +32,8 @@ ready for the build to start.
 - Which Cloudflare account this project is created in.
 - A logo file of at least 512 px (an SVG is best). The app's home-screen icons need 192 and 512 px, and
   the only logo file so far is 128 px.
-- The mrkwp-core build jobs work (its specification is in the site repository), or a stand-in for it
-  while this is built.
+- A service account and application password on mrkdevelopment.net, and the firewall user agent, typed
+  into Cloudflare's secrets by Matt.
+
+The backend's first piece is live (mrkwp-core 1.8.1): sign-ups become jobs, clients are emailed their
+link, and this app can read a job and mark it confirmed.

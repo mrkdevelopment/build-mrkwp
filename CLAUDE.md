@@ -1,6 +1,10 @@
 # Working on build-mrkwp
 
-The app at build.mrkwp.com. Read `docs/SPECIFICATION.md` before writing anything: it is the brief.
+The app at build.mrkwp.com. Read `docs/START-HERE.md` first (what exists today and what to build
+first), then `docs/SPECIFICATION.md` (the full brief), before writing anything.
+
+Keep `docs/START-HERE.md` true: when a phase is finished or the backend gains a route, update it in
+the same change.
 
 ## Who uses it
 
@@ -17,6 +21,10 @@ They live in the mrkwp.com site repository, on branch `1.8.0` until it is merged
   routes this app calls and the hook it receives. **That file is the contract. If this app needs a route
   changed, change it there first.**
 - `REBUILD-SPEC-2-WEBSITE.md`: the sign-up form that sends people here.
+
+The backend plugin is at `~/Local Sites/mrkwp/app/public/wp-content/plugins/mrkwp-core` (branch
+`1.8.1`, live on mrkdevelopment.net). Read it to check how a route behaves; **do not change it from a
+session in this project**. Backend changes are asked of Matt and done in their own session.
 
 Do not copy those files into this repository. Two copies drift apart.
 
