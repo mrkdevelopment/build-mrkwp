@@ -2,26 +2,65 @@
 // A job: /rebuild/RB-1042. With ?k=<code> it is the link from the email.
 import { env } from 'cloudflare:workers';
 import Heading from '../../components/Heading.astro';
+import KeepTyping from '../../components/KeepTyping.astro';
 import Layout from '../../layouts/Layout.astro';
+import { draftFor } from '../../lib/business-actions.ts';
+import { screenFor, type Draft, type Screen } from '../../lib/business.ts';
 import { openJob } from '../../lib/open-job.ts';
+import { getJob, latestRun, type ScanRunRow } from '../../lib/store.ts';
+import Address from '../../products/rebuild/Address.astro';
+import Checking from '../../products/rebuild/Checking.astro';
+import Found from '../../products/rebuild/Found.astro';
+import Missed from '../../products/rebuild/Missed.astro';
+import NotAFit from '../../products/rebuild/NotAFit.astro';
 import { STAGES, STEPS, UNKNOWN_STAGE } from '../../products/rebuild/stages.ts';
+import Wants from '../../products/rebuild/Wants.astro';
 import Welcome from '../../products/rebuild/Welcome.astro';
 
-const visit = await openJob(env, Astro.cookies, Astro.url, Astro.params);
+let from = '';
+try {
+  from = Astro.clientAddress;
+} catch {
+  // No address to count wrong links against: carry on without.
+}
+
+const visit = await openJob(env, Astro.cookies, Astro.url, Astro.params, from);
 if (visit.show === 'redirect') return Astro.redirect(visit.to, 302);
 if (visit.show === 'wrong') Astro.response.status = 404;
 if (visit.show === 'busy') Astro.response.status = 503;
+if (visit.show === 'slow') Astro.response.status = 429;
 
 const job = visit.show === 'job' ? visit.job : null;
 const screen = job ? (STAGES[job.stage] ?? UNKNOWN_STAGE) : null;
+
+// "Your business" is several screens in one stage: which one depends on what they've done so far.
+let draft: Draft | null = null;
+let run: ScanRunRow | null = null;
+let step: Screen | null = null;
+if (job && screen?.screen === 'business') {
+  const row = await getJob(env.DB, job.number);
+  if (row) {
+    draft = await draftFor(env, row);
+    run = await latestRun(env.DB, job.number);
+    step = screenFor(draft, run, Date.now());
+  }
+}
+const here = job ? `/${job.product}/${job.number}` : '/';
+const read = run?.result ? (JSON.parse(run.result) as { reachable?: boolean }).reachable !== false : true;
 ---
 
 {
   job && screen ? (
-    <Layout title={`Job ${job.number}`} jobNumber={job.number} progress={{ steps: STEPS, done: screen.done }}>
-      {screen.screen === 'welcome' ? (
-        <Welcome firstName={job.first_name} />
-      ) : (
+    <Layout title={`Job ${job.number}`} jobNumber={job.number} progress={{ steps: STEPS, done: screen.done }} refresh={step === 'checking' ? 3 : undefined}>
+      {screen.screen === 'welcome' && <Welcome firstName={job.first_name} />}
+      {screen.screen === 'not_a_fit' && <NotAFit scan={job.scan} jobNumber={job.number} />}
+      {draft && step === 'address' && <Address address={draft.address} note={draft.note} />}
+      {draft && step === 'checking' && <Checking address={run?.address ?? draft.address} here={here} />}
+      {draft && step === 'found' && <Found lines={draft.lines} error={draft.error} read={read} />}
+      {draft && step === 'missed' && <Missed draft={draft} />}
+      {draft && step === 'wants' && <Wants goals={draft.goals} />}
+      {draft && (step === 'missed' || step === 'wants') && <KeepTyping />}
+      {screen.screen === 'message' && (
         <>
           <Heading plain={screen.heading} payoff={screen.payoff} />
           <p class="mt-5 text-lg leading-relaxed">{screen.text}</p>
@@ -35,6 +74,11 @@ const screen = job ? (STAGES[job.stage] ?? UNKNOWN_STAGE) : null;
     <Layout title="Try again shortly">
       <Heading plain="We can't open your job" payoff="just now." />
       <p class="mt-5 text-lg leading-relaxed">Nothing is wrong with your link. Please wait a few minutes, then open it again.</p>
+    </Layout>
+  ) : visit.show === 'slow' ? (
+    <Layout title="Try again in ten minutes">
+      <Heading plain="Too many tries." payoff="Please wait ten minutes." />
+      <p class="mt-5 text-lg leading-relaxed">Several links that weren't right were opened from your connection. Wait ten minutes, then open the link in your email again.</p>
     </Layout>
   ) : (
     <Layout title="This link isn't right">

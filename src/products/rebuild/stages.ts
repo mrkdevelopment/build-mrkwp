@@ -7,8 +7,11 @@ export const STEPS = ['Sign up', 'Your business', 'Five designs', 'Pick and pay'
 export interface StageScreen {
   /** How many of the five steps are finished. The next one is the step the client is on. */
   done: number;
-  /** `welcome` has its own screen. The rest show a heading and a few plain lines until their screens are built. */
-  screen: 'welcome' | 'message';
+  /**
+   * `welcome`, `business` (the "Your business" screens) and `not_a_fit` have their own screens.
+   * The rest show a heading and a few plain lines until their screens are built.
+   */
+  screen: 'welcome' | 'business' | 'not_a_fit' | 'message';
   heading: string;
   /** The part of the heading shown in blue. */
   payoff: string;
@@ -19,9 +22,9 @@ const soon = "We'll email you as soon as there's something for you to do. You ca
 
 export const STAGES: Record<string, StageScreen> = {
   signed_up: { done: 1, screen: 'welcome', heading: '', payoff: '', text: '' },
-  confirmed: { done: 1, screen: 'message', heading: "You're in.", payoff: 'Your next step is on its way.', text: "Next we'll ask about your business and take a look at your current website. That step is being finished now, and we'll email you the moment it's ready. You don't need to do anything until then." },
-  not_a_fit: { done: 1, screen: 'message', heading: 'This one', payoff: 'needs a conversation.', text: "Your website needs a closer look than our automatic checks can give it. We'll be in touch by email to set up a free 20-minute call." },
-  ready: { done: 2, screen: 'message', heading: "We're on it.", payoff: 'Your designs come next.', text: soon },
+  confirmed: { done: 1, screen: 'business', heading: '', payoff: '', text: '' },
+  not_a_fit: { done: 1, screen: 'not_a_fit', heading: '', payoff: '', text: '' },
+  ready: { done: 2, screen: 'message', heading: "We're on it.", payoff: 'Your designs come next.', text: "That's everything we need. We'll make five designs for your new website and email and text you when they're ready to look at, usually within a few working days. You can close this page." },
   claimed: { done: 2, screen: 'message', heading: "We're on it.", payoff: 'Your designs come next.', text: soon },
   designing: { done: 2, screen: 'message', heading: "We're on it.", payoff: 'Your designs are being made.', text: soon },
   designs_received: { done: 2, screen: 'message', heading: "We're on it.", payoff: 'Your designs are being made.', text: soon },

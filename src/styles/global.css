@@ -51,6 +51,25 @@
   @apply btn-rise btn-rise-blue inline-flex items-center gap-2 rounded-xl bg-signal px-7 py-3.5 text-base font-bold text-white shadow-lg shadow-signal/25 hover:bg-signal-deep;
   min-height: 3rem;
 }
+/* A text box or text area, sized for a thumb. 16px text stops phones zooming in on focus. */
+@utility field {
+  @apply block w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-base text-navy placeholder:text-slate-400;
+  min-height: 3rem;
+  &:focus-visible { outline: 2px solid var(--color-signal); outline-offset: 1px; border-color: var(--color-signal); }
+}
+/* A small button inside a list line. */
+@utility line-button {
+  @apply rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-navy hover:border-signal/40;
+  min-height: 2.75rem;
+  list-style: none;
+  &::-webkit-details-marker { display: none; }
+}
+@utility checking-bar {
+  animation: checking 1.4s ease-in-out infinite alternate;
+  @media (prefers-reduced-motion: reduce) { animation: none; width: 100%; opacity: 0.5; }
+}
+@keyframes checking { from { translate: 0 0; } to { translate: 200% 0; } }
+
 @utility btn-secondary {
   @apply btn-rise inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-7 py-3.5 text-base font-semibold text-navy hover:border-signal/40;
   min-height: 3rem;

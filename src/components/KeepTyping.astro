@@ -1,0 +1,27 @@
+---
+// Saves what has been typed in any form marked `data-keep`, a moment after the typing stops and
+// again if the page is left. So closing the tab mid-sentence loses nothing. Forms work without it.
+---
+
+<script>
+  for (const form of document.querySelectorAll<HTMLFormElement>('form[data-keep]')) {
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const send = () => {
+      timer = undefined;
+      const data = new FormData(form);
+      data.set('do', 'keep');
+      fetch(form.action, { method: 'POST', body: data, keepalive: true }).catch(() => {});
+    };
+    form.addEventListener('input', () => {
+      clearTimeout(timer);
+      timer = setTimeout(send, 1200);
+    });
+    form.addEventListener('submit', () => clearTimeout(timer));
+    addEventListener('pagehide', () => {
+      if (timer) {
+        clearTimeout(timer);
+        send();
+      }
+    });
+  }
+</script>

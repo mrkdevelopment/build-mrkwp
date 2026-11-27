@@ -1,0 +1,32 @@
+---
+// The site needs a conversation before we can quote: say plainly why, and offer the free call.
+import Heading from '../../components/Heading.astro';
+import { BOOKING_URL } from './config.ts';
+
+interface Props {
+  /** The check's result as saved on the job. Written by a stranger's website: shown as text only. */
+  scan: unknown;
+  jobNumber: string;
+}
+const { scan, jobNumber } = Astro.props;
+const s = (scan && typeof scan === 'object' && !Array.isArray(scan) ? scan : {}) as { fit_reasons?: unknown; shop_signs?: unknown; pages?: unknown };
+const reasons = Array.isArray(s.fit_reasons) ? s.fit_reasons : [];
+const signs = Array.isArray(s.shop_signs) ? s.shop_signs.filter((x): x is string => typeof x === 'string').slice(0, 2) : [];
+
+const why: string[] = [];
+if (reasons.includes('shop')) why.push(`Your website has an online shop${signs.length ? ` (we found ${signs.join(' and ')})` : ''}. Shops need their products, payments and orders moved with care.`);
+if (reasons.includes('members')) why.push("Your website has a members' or log-in area. Those accounts need to keep working after a rebuild.");
+if (reasons.includes('large')) why.push(`Your website is large${typeof s.pages === 'number' ? `: we counted about ${s.pages} pages` : ''}. That's more than our standard rebuild covers.`);
+if (why.length === 0) why.push('Your website needs a closer look than our automatic check can give it.');
+---
+
+<Heading plain="This one" payoff="needs a conversation." />
+<p class="mt-5 text-lg leading-relaxed">We can still help, but not with the standard rebuild. Here's why:</p>
+<ul class="mt-4 list-disc space-y-2 pl-5 text-lg leading-relaxed">
+  {why.map((line) => <li>{line}</li>)}
+</ul>
+<p class="mt-5 leading-relaxed">A 20-minute call is the quickest way to work out the right plan and price. It's free, and there's nothing to prepare.</p>
+<a href={BOOKING_URL} class="btn-primary mt-8" rel="noopener">Book a free 20-minute call <span aria-hidden="true">→</span></a>
+<p class="mt-8 text-sm text-slate-600">
+  Your job number is <span class="font-mono font-semibold text-navy">{jobNumber}</span>. Quote it when you get in touch.
+</p>

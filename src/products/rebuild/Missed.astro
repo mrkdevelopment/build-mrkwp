@@ -1,0 +1,38 @@
+---
+// "Anything we missed?": only what the check didn't find, all of it optional.
+import Heading from '../../components/Heading.astro';
+import { ASKED_NETWORKS, type Draft } from '../../lib/business.ts';
+
+interface Props {
+  draft: Draft;
+}
+const { draft } = Astro.props;
+const found = new Set(draft.lines.filter((line) => line.key.startsWith('social:') && !line.removed).map((line) => line.label));
+const networks = ASKED_NETWORKS.filter((network) => !found.has(network));
+---
+
+<Heading plain="Anything" payoff="we missed?" />
+<p class="mt-5 text-lg leading-relaxed">These all help, and none are needed. Leave a box empty if you don't have it to hand.</p>
+{draft.error && <p role="alert" class="mt-5 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 leading-relaxed text-amber-900">{draft.error}</p>}
+
+<form method="post" action="/api/job/business" class="mt-6 space-y-6" data-keep>
+  <input type="hidden" name="do" value="missed" />
+  <div>
+    <label for="abn" class="block font-semibold text-navy">ABN <span class="font-normal text-slate-600">(optional)</span></label>
+    <input id="abn" name="abn" type="text" inputmode="numeric" autocomplete="off" maxlength="20" value={draft.abn} placeholder="11 digits" class="field mt-2" />
+  </div>
+  <div>
+    <label for="google" class="block font-semibold text-navy">Google Business Profile link <span class="font-normal text-slate-600">(optional)</span></label>
+    <p id="google-help" class="mt-1 text-sm leading-relaxed text-slate-600">Find your business on Google Maps, tap Share, and paste the link here.</p>
+    <input id="google" name="google" type="text" inputmode="url" autocapitalize="none" autocorrect="off" spellcheck="false" maxlength="500" value={draft.google} aria-describedby="google-help" class="field mt-2" />
+  </div>
+  {
+    networks.map((network) => (
+      <div>
+        <label for={`social-${network}`} class="block font-semibold text-navy">{network} page <span class="font-normal text-slate-600">(optional)</span></label>
+        <input id={`social-${network}`} name={`social:${network}`} type="text" inputmode="url" autocapitalize="none" autocorrect="off" spellcheck="false" maxlength="300" value={draft.added[network] ?? ''} class="field mt-2" />
+      </div>
+    ))
+  }
+  <button type="submit" class="btn-primary">Next <span aria-hidden="true">→</span></button>
+</form>

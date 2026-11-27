@@ -6,6 +6,8 @@ interface BuildSecrets {
   BUILD_API_PASSWORD: string;
   WP_USER_AGENT: string;
   SESSION_SECRET: string;
+  /** Optional. When set, a typed ABN is looked up on the Australian Business Register. */
+  ABN_LOOKUP_GUID?: string;
 }
 interface Env extends BuildSecrets {}
 declare namespace Cloudflare {

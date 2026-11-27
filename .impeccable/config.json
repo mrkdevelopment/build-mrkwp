@@ -1,0 +1,14 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "overused-font",
+        "value": "space grotesk",
+        "createdAt": "2026-11-27T18:19:35.224Z",
+        "reason": "Claude decided: Space Grotesk is the display font set by DESIGN.md (copied from the mrkwp.com design system, which CLAUDE.md says not to edit here); the flagged line is a made-up test page"
+      }
+    ]
+  }
+}

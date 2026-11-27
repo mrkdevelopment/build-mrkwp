@@ -1,0 +1,53 @@
+---
+// "Here's what we found": each line can be corrected or removed. Works without any script:
+// "Change" is an ordinary fold-out, and every button is its own small form.
+import Heading from '../../components/Heading.astro';
+import type { Line } from '../../lib/business.ts';
+import FoundLine from './FoundLine.astro';
+
+interface Props {
+  lines: Line[];
+  /** A message about the last change they tried. */
+  error: string;
+  /** False when the site couldn't be read, so there is little to show. */
+  read: boolean;
+}
+const { lines, error, read } = Astro.props;
+const main = lines.filter((line) => line.group === 'main');
+const builders = lines.filter((line) => line.group === 'builders');
+---
+
+<Heading plain="Here's what" payoff="we found." />
+{
+  read ? (
+    <p class="mt-5 text-lg leading-relaxed">Have a quick look. Fix anything that's wrong, then carry on.</p>
+  ) : (
+    <p class="mt-5 text-lg leading-relaxed">We couldn't read your website ourselves, so one of us will look at it by hand. Tell us your business name and carry on.</p>
+  )
+}
+{error && <p role="alert" class="mt-5 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 leading-relaxed text-amber-900">{error}</p>}
+
+<ul class="mt-6 divide-y divide-slate-200 rounded-2xl border border-slate-200 bg-white">
+  {main.map((line) => <li class="px-4 py-4 sm:px-5"><FoundLine line={line} /></li>)}
+</ul>
+
+{
+  builders.length > 0 && (
+    <details class="mt-5 rounded-2xl border border-slate-200 bg-white">
+      <summary class="cursor-pointer px-4 py-4 font-semibold text-navy sm:px-5">The technical bits, for our builders ({builders.filter((l) => !l.removed).length})</summary>
+      <p class="px-4 text-sm leading-relaxed text-slate-600 sm:px-5">You don't need to know these. If one is plainly wrong, remove it and we'll check.</p>
+      <ul class="mt-3 divide-y divide-slate-200 border-t border-slate-200">
+        {builders.map((line) => <li class="px-4 py-4 sm:px-5"><FoundLine line={line} /></li>)}
+      </ul>
+    </details>
+  )
+}
+
+<form method="post" action="/api/job/business" class="mt-8">
+  <input type="hidden" name="do" value="found_ok" />
+  <button type="submit" class="btn-primary">Looks right <span aria-hidden="true">→</span></button>
+</form>
+<form method="post" action="/api/job/business" class="mt-6">
+  <input type="hidden" name="do" value="restart" />
+  <button type="submit" class="text-sm font-semibold text-signal underline">This isn't my website. Check a different address</button>
+</form>

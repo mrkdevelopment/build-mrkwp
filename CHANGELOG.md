@@ -1,5 +1,29 @@
 # Changelog
 
+## 1.1.0 (built 28 Nov 2026, not yet deployed)
+
+"Your business": after pressing Start, a client now tells us about their business in a few short screens.
+
+- **We look at their website for them.** They confirm their web address (already filled in from the
+  sign-up form) and the app reads their public site in about ten seconds: business name, logo, main colour,
+  phone, address, social pages, how many pages, what it is built with, who runs their email and domain,
+  and the tools it uses.
+- **"Here's what we found"** shows it back in plain words. Anything wrong can be changed or removed with
+  one tap, and we keep a note of what was changed.
+- **"Anything we missed?"** asks only for what the check didn't find: ABN, Google Business Profile link
+  and social pages. All optional.
+- **"What should your new website do better?"** One optional box, then the job is ready for designs.
+- **Sites that need a conversation are told why.** An online shop, a members' area or more than 300 pages
+  gets a plain explanation and a button to book the free 20-minute call.
+- **A site we can't read is never turned away.** The client checks the address once; after that the job
+  carries on and one of us looks at the site by hand.
+- **Typing saves itself.** Closing the page mid-sentence loses nothing.
+- **Safer now the site is public.** Repeated wrong links from one connection are slowed down, pages can
+  only load their own files, and the site check refuses any address that points at a private network.
+
+Until mrkdevelopment.net can receive these answers they are kept here and re-sent every hour, so this
+version should wait for that before real clients use it.
+
 ## 1.0.1 (28 Nov 2026)
 
 - **The app now builds on Cloudflare.** The first build there stopped because the code check could not
