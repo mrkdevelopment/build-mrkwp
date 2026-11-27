@@ -33,5 +33,5 @@ exists today, how to run it, and what comes next. `CHANGELOG.md` lists what each
 - A logo file of at least 512 px (an SVG is best). The app's home-screen icons need 192 and 512 px, and
   the only logo file so far is 128 px.
 
-The backend's first piece is live (mrkwp-core 1.8.2): sign-ups become jobs, clients are emailed their
-link, and this app can read a job and mark it confirmed.
+The backend's first piece is live (mrkwp-core 1.8.4): sign-ups become jobs, clients are emailed their
+link, and this app can read a job, mark it confirmed, and send the client's business details and goals.

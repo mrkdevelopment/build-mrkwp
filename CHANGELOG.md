@@ -1,6 +1,14 @@
 # Changelog
 
-## 1.1.1 (built 28 Nov 2026, not yet deployed)
+## 1.1.2 (28 Nov 2026)
+
+Notes only; nothing a client sees has changed.
+
+- **mrkdevelopment.net now receives the "Your business" answers** (mrkwp-core 1.8.4). A client's business
+  details, the check of their website and what they want arrive within a second or two of "Start my
+  designs", the job becomes ready, and the builders are told. The project's notes now say so.
+
+## 1.1.1 (28 Nov 2026)
 
 Changes to "Your business" after Matt tried it on a real site.
 
