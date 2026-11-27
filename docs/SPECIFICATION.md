@@ -25,8 +25,8 @@ Built to take a second product later (a QR contact card at `/card/`) without rew
 | Code | This repository, `mrkdevelopment/build-mrkwp`, at its root | Its own project, versions and deploys. Its build must not need WordPress |
 | Framework | Astro with the Cloudflare adapter, pages rendered on request | The same framework and components as the main site. Check the adapter's current set-up against the Astro docs before starting; it has changed between versions |
 | Job data | Cloudflare D1 | The working copy of each job, and the outbox (section 4) |
-| Pictures | Cloudflare R2, private | The ten design pictures per job. Served only through the app, to the job's owner |
-| Secrets | Cloudflare secrets: `BUILD_API_URL`, `BUILD_API_USER`, `BUILD_API_PASSWORD`, `WP_USER_AGENT`, `HOOK_SECRET`, `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `ABN_LOOKUP_GUID`, `PAGESPEED_API_KEY` (optional), `SESSION_SECRET` | None in the repo |
+| Pictures | mrkdevelopment.net's media library | The ten design pictures per job, shown from their own addresses. The R2 store exists and is not used for now |
+| Secrets | Cloudflare secrets: `BUILD_API_URL`, `BUILD_API_USER`, `BUILD_API_PASSWORD`, `WP_USER_AGENT`, `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `ABN_LOOKUP_GUID`, `PAGESPEED_API_KEY` (optional), `SESSION_SECRET` | None in the repo |
 | Look | `DESIGN.md` in this repository (the main site's, copied 27 Nov 2026) and the logo files in `assets/brand/` | It should feel like the same business |
 
 mrkdevelopment.net holds the master record. This app holds a working copy so client screens never wait
@@ -40,9 +40,7 @@ on WordPress.
 | `/rebuild/RB-1042?k=<code>` | The link in the confirm email. Checks the code, starts a session, then redirects to the same address without `?k=`, so the code doesn't stay in the address bar, history or analytics |
 | `/rebuild/RB-1042` | The job. Shows the screen for the job's current stage (section 3) |
 | `/rebuild/RB-1042/designs/3` | One design, full size, desktop and phone |
-| `/rebuild/RB-1042/img/3-desktop.webp` | A picture, from R2, only with the job's session |
 | `/api/job/*` | What the screens call: save details, run scans, save ranking, save extras, start payment, approve |
-| `/api/hooks/job` | mrkdevelopment.net says a job changed (section 4) |
 | `/api/hooks/stripe` | Stripe says a payment cleared (section 6) |
 
 Every page sends `noindex` and the app has a `robots.txt` that disallows everything. No sitemap.
@@ -83,22 +81,14 @@ Rules for every screen:
 
 ## 4. Keeping in step with mrkdevelopment.net
 
-**Until the hook below exists on the backend, the app pulls**: it fetches a job on the client's first
-visit and again on any later visit when its copy is more than a minute old. Keep that as a fallback
-afterwards.
+**The app asks; WordPress sends it nothing** (simplified by Matt, 28 Nov 2026). The app fetches a job on
+the client's first visit and again on any later visit when its copy is more than a minute old. That is
+the whole mechanism. There is no hook from mrkdevelopment.net, no `HOOK_SECRET`, and no `edge-confirm`.
 
-**Coming in.** mrkdevelopment.net posts `{number, event, at}` to `/api/hooks/job`, signed with HMAC
-SHA-256 using `HOOK_SECRET`. The worker:
-
-1. Checks the signature and that `at` is within five minutes. Otherwise 401.
-2. Fetches the job: `GET /build/jobs/{number}` with the application password, the stored private code in
-   `X-Job-Token`, and `WP_USER_AGENT`.
-3. Writes it to D1.
-4. **If the event is `designs_received`:** downloads all ten pictures into R2, checks each against its
-   expected size, computes a SHA-256 of each, confirms there are five designs and ten pictures, then
-   calls `POST /build/jobs/{number}/edge-confirm` with the counts and checksums. Only when that answers
-   200 does it mark the job `designs_ready` locally.
-5. Answers 200. Any failure answers 500, and mrkdevelopment.net retries after 1, 5 and 30 minutes.
+**Designs.** When a fetched job is at `designs_ready` it carries five designs, each with a `desktop` and a
+`mobile` picture (`url`, `width`, `height`). The app shows the pictures straight from those addresses,
+which are ordinary media-library addresses on mrkdevelopment.net. It does not copy them into R2 or check
+them. The shape is in `docs/briefs/DESIGNS-1-MRKWP-CORE.md`.
 
 The first time a job is seen is the client's own first visit (`?k=`): the worker fetches the job with
 the code from the link, and stores the job, and the code encrypted with `SESSION_SECRET`, in D1.
@@ -220,16 +210,16 @@ event. Set up so GA treats build.mrkwp.com and www.mrkwp.com as one site.
 
 - Every job has a `product`. The screens for a product live in their own folder (`rebuild/`), with a
   small file that maps stage to screen.
-- Shared by all products: link sign-in, sessions, the hook and outbox, Stripe, the layout, the installable
+- Shared by all products: link sign-in, sessions, the outbox, Stripe, the layout, the installable
   shell.
 - Adding `/card/` later means a new folder and a new stage map, not changes to the shared parts.
 
 ## 11. Order of building
 
-1. Project, domain, D1 and R2, link sign-in, the hook, the outbox. A job created by hand in
+1. Project, domain, D1, link sign-in, the outbox. A job created by hand in
    mrkdevelopment.net can be opened.
 2. Welcome, Your business, the scans, What we found, the not-a-fit screen, What you want.
-3. The `designs_received` pull and confirm; the designs, ranking and extras screens.
+3. The designs, ranking and extras screens.
 4. Price and Stripe, in test mode.
 5. Demo, approve, ask for changes, the closing screens.
 6. Installable shell, tracking, accessibility pass.
@@ -242,7 +232,6 @@ event. Set up so GA treats build.mrkwp.com and www.mrkwp.com as one site.
 - A private or local address typed as the website is refused.
 - With mrkdevelopment.net switched off: an existing job still opens and its designs still show; a
   ranking is accepted and arrives in mrkdevelopment.net once it is back.
-- A `designs_received` hook with one picture missing does not confirm, and the client is not told.
 - A test payment marks the job paid exactly once, even when Stripe sends the event twice.
 - Another job's number with this job's session shows nothing.
 - The app can be added to a phone's home screen and opens to the job.
