@@ -19,9 +19,9 @@
       "migrations_dir": "migrations"
     }
   ],
-  // The private store for design pictures (R2, binding PICTURES, bucket "build-mrkwp-pictures") is left
-  // out until the designs phase: R2 is not switched on in the MRK WP account yet, and a deploy that
-  // names a missing bucket fails.
+  // Private store for design pictures, created in the MRK WP account on 28 Nov 2026 (Oceania). It has
+  // no public address. Not used until the designs phase.
+  "r2_buckets": [{ "binding": "PICTURES", "bucket_name": "build-mrkwp-pictures" }],
   // Sends anything waiting in the outbox, once a minute.
   "triggers": { "crons": ["* * * * *"] },
   // "test" is only ever run on this computer (npm run dev:test), against the stand-in backend in

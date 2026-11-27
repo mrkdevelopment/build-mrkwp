@@ -60,7 +60,7 @@ a real phone; the deployed worker's one-minute schedule (locally it was triggere
 the daily check, and the `scan_runs` and `stripe_events` tables. Each belongs to a later phase.
 
 **On Cloudflare (MRK WP account) on 28 Nov 2026:** the D1 database `build-mrkwp` exists (Oceania) with
-its tables, and its id is in `wrangler.jsonc`. Nothing else exists there yet: the app has not been deployed.
+its tables, and its id is in `wrangler.jsonc`. The app has not been deployed.
 
 **Deploying** is done by Cloudflare from GitHub's `main` branch: build command `npm run build`, deploy
 command `npx wrangler deploy`, preview builds off. `.node-version` asks the builder for Node 24. Still to do:
@@ -72,9 +72,8 @@ command `npx wrangler deploy`, preview builds off. `.node-version` asks the buil
 - Add the custom domain `build.mrkwp.com` to the worker. That is when emailed links start working.
 - New tables in a later version are added with `npx wrangler d1 migrations apply DB --remote`.
 
-**The picture store (R2) is left out for now.** R2 is not switched on in the MRK WP account, so the bucket
-could not be created and its entry was taken out of `wrangler.jsonc`. Matt switches R2 on in the dashboard
-before the designs phase; then create `build-mrkwp-pictures` and put the `PICTURES` entry back.
+**The picture store** `build-mrkwp-pictures` (R2, Oceania, no public address) also exists there and is
+named in `wrangler.jsonc` as `PICTURES`. Nothing uses it until the designs phase.
 
 Astro's Cloudflare adapter also asks for a KV store called `SESSION` on first deploy, which this app
 doesn't use. Not yet seen whether an automated deploy creates it by itself.
