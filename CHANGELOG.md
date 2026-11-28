@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.2.1 (28 Nov 2026)
+
+One change of wording.
+
+- **The fourth step in the progress strip is now "Payment".** It was "Pick and pay". The five steps a client
+  sees at the top of every screen are Sign up, Your business, Five designs, Payment, Go live.
+
 ## 1.2.0 (28 Nov 2026)
 
 "Your five designs": a client can now see their designs and tell us what they think.

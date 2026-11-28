@@ -87,7 +87,7 @@ doesn't use. The first deploy created it by itself, as `build-mrkwp-session`. It
 **Decisions made while building, to confirm with Matt:**
 
 - The five steps in the progress strip are the tiles planned for the landing page: Sign up, Your business,
-  Five designs, Pick and pay, Go live.
+  Five designs, Payment, Go live. (The fourth was "Pick and pay" until Matt renamed it on 28 Nov 2026.)
 - While a client's answer is still waiting in the outbox, a fresh copy from mrkdevelopment.net does not
   overwrite the copy here. Otherwise pressing Start during an outage would bounce them back to Welcome.
 - A job's outbox rows are sent in the order the client made them; a row that can't go yet holds the later
@@ -178,9 +178,9 @@ after the deploy went out without them and every link showed an error. Any later
 deploy command in Cloudflare changed to run it first. 1.1.1 has no new tables. The booking link for the free call is Matt's
 Google Calendar booking page, set in `src/products/rebuild/config.ts` until the backend's `GET /config` exists.
 
-## Phase 3: "Your five designs" (version 1.2.0, built 28 Nov 2026, not deployed)
+## Phase 3: "Your five designs" (version 1.2.0, merged into `main` 28 Nov 2026)
 
-On branch `1.2.0`. A job at `designs_ready` shows its five designs instead of a holding message.
+Built on branch `1.2.0`. Version 1.2.1 only renames the fourth progress step to "Payment". A job at `designs_ready` shows its five designs instead of a holding message.
 
 - **Where the designs come from.** mrkwp-core 1.8.5 puts them on the job this app reads: five of
   `{position, name, idea, notes, desktop, mobile}`, each picture `{url, width, height}`. This app asks for
