@@ -8,14 +8,16 @@ export interface StageScreen {
   /** How many of the five steps are finished. The next one is the step the client is on. */
   done: number;
   /**
-   * `welcome`, `business` (the "Your business" screens) and `not_a_fit` have their own screens.
+   * `welcome`, `business` (the "Your business" screens), `not_a_fit` and `designs` have their own screens.
    * The rest show a heading and a few plain lines until their screens are built.
    */
-  screen: 'welcome' | 'business' | 'not_a_fit' | 'message';
+  screen: 'welcome' | 'business' | 'not_a_fit' | 'designs' | 'message';
   heading: string;
   /** The part of the heading shown in blue. */
   payoff: string;
   text: string;
+  /** A second paragraph, where the screen needs one. */
+  more?: string;
 }
 
 const soon = "We'll email you as soon as there's something for you to do. You can close this page.";
@@ -28,8 +30,16 @@ export const STAGES: Record<string, StageScreen> = {
   claimed: { done: 2, screen: 'message', heading: "We're on it.", payoff: 'Your designs come next.', text: soon },
   designing: { done: 2, screen: 'message', heading: "We're on it.", payoff: 'Your designs are being made.', text: soon },
   designs_received: { done: 2, screen: 'message', heading: "We're on it.", payoff: 'Your designs are being made.', text: soon },
-  designs_ready: { done: 2, screen: 'message', heading: 'Your five designs', payoff: 'are ready.', text: "We're getting them ready to show you here. " + soon },
-  ranked: { done: 3, screen: 'message', heading: 'Thanks for choosing.', payoff: "We're working out your price.", text: soon },
+  // If a job says its designs are ready but none arrive with it, the plain message below is shown instead.
+  designs_ready: { done: 2, screen: 'designs', heading: 'Your five designs', payoff: 'are nearly here.', text: "We're getting them ready to show you. Please look again in a few minutes." },
+  ranked: {
+    done: 3,
+    screen: 'message',
+    heading: 'Thanks.',
+    payoff: "We're working out your costing.",
+    text: 'We have your design choices and are working out the cost to deliver your website. We\'ll email you when it\'s ready.',
+    more: 'Any further rounds of feedback can be booked as a paid video meeting. That lets us go through your design with you and gather the right feedback to get the results you need.',
+  },
   priced: { done: 3, screen: 'message', heading: 'Your price', payoff: 'is ready.', text: "We're getting it ready to show you here. " + soon },
   paid: { done: 4, screen: 'message', heading: 'Thank you.', payoff: 'Your build has started.', text: soon },
   building: { done: 4, screen: 'message', heading: 'Thank you.', payoff: 'Your build has started.', text: soon },

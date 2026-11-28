@@ -1,0 +1,46 @@
+---
+// One small family of line icons, drawn the same weight everywhere. They are Lucide's own icons
+// (lucide.dev, the set MRK WP uses elsewhere), from its Astro package: to add one, import it from
+// `@lucide/astro/icons/<its-name>` and give it a plain name below.
+// Icons are decoration beside a label: the label carries the meaning, so they are hidden from readers.
+import ArrowDown from '@lucide/astro/icons/arrow-down';
+import ArrowRight from '@lucide/astro/icons/arrow-right';
+import ArrowUp from '@lucide/astro/icons/arrow-up';
+import ChevronDown from '@lucide/astro/icons/chevron-down';
+import ChevronLeft from '@lucide/astro/icons/chevron-left';
+import ChevronRight from '@lucide/astro/icons/chevron-right';
+import GripVertical from '@lucide/astro/icons/grip-vertical';
+import Info from '@lucide/astro/icons/info';
+import MessageSquareText from '@lucide/astro/icons/message-square-text';
+import Monitor from '@lucide/astro/icons/monitor';
+import Smartphone from '@lucide/astro/icons/smartphone';
+import ThumbsDown from '@lucide/astro/icons/thumbs-down';
+import ThumbsUp from '@lucide/astro/icons/thumbs-up';
+import X from '@lucide/astro/icons/x';
+
+const ICONS = {
+  left: ChevronLeft,
+  right: ChevronRight,
+  down: ChevronDown,
+  arrow: ArrowRight,
+  moveup: ArrowUp,
+  movedown: ArrowDown,
+  grip: GripVertical,
+  close: X,
+  like: ThumbsUp,
+  dislike: ThumbsDown,
+  computer: Monitor,
+  phone: Smartphone,
+  notes: MessageSquareText,
+  info: Info,
+};
+
+interface Props {
+  name: keyof typeof ICONS;
+  class?: string;
+}
+const { name, class: className = 'h-4 w-4' } = Astro.props;
+const Shape = ICONS[name];
+---
+
+<Shape class={className} aria-hidden="true" focusable="false" />

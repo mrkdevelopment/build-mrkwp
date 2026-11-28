@@ -1,0 +1,160 @@
+---
+// The last look before a client's choices are sent. Like a shopping cart, it lists only what they
+// chose: the designs they liked, with their notes on each and a way back to change it. Designs
+// they disliked or skipped are not listed (they are still sent, so we know).
+//
+// When more than one design is liked, the list is their order of preference. The first is the
+// design we build from; the others are where we borrow what they liked. Each row has arrows to
+// move it up or down, which work as ordinary buttons with no script. The script at the bottom moves
+// rows in place instead of reloading, and lets a mouse drag them.
+//
+// Then one optional box for anything else. Next come the costing questions (DesignsNeeds.astro),
+// and nothing is sent until the end of those.
+import Heading from '../../components/Heading.astro';
+import Icon from '../../components/Icon.astro';
+import { rankOrder, type Design, type RankingDraft } from '../../lib/designs.ts';
+
+interface Props {
+  designs: Design[];
+  ranking: RankingDraft;
+}
+const { designs, ranking } = Astro.props;
+const likesOf = (design: Design): string => ranking.likes[String(design.position)] ?? '';
+const dislikesOf = (design: Design): string => ranking.dislikes[String(design.position)] ?? '';
+// The liked designs, first choice first.
+const liked = rankOrder(ranking.rank, ranking.picks, designs)
+  .map((position) => designs.find((design) => design.position === position))
+  .filter((design): design is Design => design !== undefined);
+const ranked = liked.length > 1;
+// Notes written on designs that aren't listed here (disliked, or not chosen) are still sent.
+const otherNotes = designs.filter((design) => !liked.includes(design) && (likesOf(design) !== '' || dislikesOf(design) !== '')).length;
+---
+
+<div class="mx-auto max-w-2xl">
+  <Heading size="headline" plain="Check" payoff="your choices." />
+  {
+    ranked ? (
+      <p class="mt-3 text-lg leading-relaxed">
+        You liked {liked.length} designs. <strong class="font-semibold text-navy">Put them in order.</strong> We'll build from your first choice and bring in what you liked from the others.
+      </p>
+    ) : (
+      <p class="mt-3 text-lg leading-relaxed">This is the design you liked. We'll build your final design from it.</p>
+    )
+  }
+  {ranking.error && <p role="alert" class="mt-4 rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 leading-relaxed text-amber-900">{ranking.error}</p>}
+
+  <form method="post" action="/api/job/designs" class="mt-6" data-keep>
+    <ol class:list={['review-list', ranked && 'is-ranked']} data-rank-list={ranked ? '' : undefined}>
+      {
+        liked.map((design) => (
+          <li class="review-row" data-name={design.name}>
+            {/* The rows are sent in the order they stand, which is the order of preference. */}
+            <input type="hidden" name="rank" value={design.position} />
+            {ranked && (
+              <div class="rank-control">
+                <button type="submit" name="move" value={`up:${design.position}`} class="icon-button move-up" aria-label={`Move ${design.name} up`}><Icon name="moveup" class="h-5 w-5" /></button>
+                <span class="rank-number" aria-hidden="true" />
+                <button type="submit" name="move" value={`down:${design.position}`} class="icon-button move-down" aria-label={`Move ${design.name} down`}><Icon name="movedown" class="h-5 w-5" /></button>
+              </div>
+            )}
+            <span class="review-thumb">{design.desktop && <img src={design.desktop.url} alt="" loading="lazy" referrerpolicy="no-referrer" draggable="false" />}</span>
+            <div class="review-body">
+              <p class="flex flex-wrap items-center gap-x-2 gap-y-1 font-display text-lg leading-tight font-bold text-navy">
+                <span class="design-num">{design.position}</span>
+                {design.name}
+              </p>
+              {ranked && <p class="first-choice">First choice: we'll build from this one</p>}
+              {likesOf(design) && <p class="note-line"><Icon name="like" class="note-icon text-teal-ink" /> <span class="whitespace-pre-line">{likesOf(design)}</span></p>}
+              {dislikesOf(design) && <p class="note-line"><Icon name="dislike" class="note-icon" /> <span class="whitespace-pre-line">{dislikesOf(design)}</span></p>}
+              {!likesOf(design) && !dislikesOf(design) && <p class="mt-2 leading-relaxed text-slate-600">You didn't add notes on it. Press Change to add some.</p>}
+            </div>
+            <button type="submit" name="back_to" value={design.position} class="line-button review-change" aria-label={`Change what you said about design ${design.position}, ${design.name}`}>Change</button>
+          </li>
+        ))
+      }
+    </ol>
+    {ranked && <p class="mt-3 text-sm leading-relaxed text-slate-600">Use the arrows to change the order<span class="drag-hint">, or drag a design up or down</span>.</p>}
+    {otherNotes > 0 && <p class="mt-2 text-sm leading-relaxed text-slate-600">Your {otherNotes === 1 ? 'note' : 'notes'} on the {otherNotes === 1 ? 'design' : 'designs'} you didn't like {otherNotes === 1 ? 'is' : 'are'} sent too.</p>}
+    {/* Says each move aloud for someone who can't see the list change. */}
+    <p class="sr-only" aria-live="polite" data-rank-live></p>
+
+    <div class="mt-8">
+      <label for="notes" class="block font-semibold text-navy">Anything else? <span class="font-normal text-slate-600">(optional)</span></label>
+      <p id="notes-help" class="mt-1 text-sm leading-relaxed text-slate-600">How you'd combine them, or anything none of the five got right.</p>
+      <textarea id="notes" name="notes" rows="4" maxlength="2000" placeholder="For example: the colours from design 2 with the layout of design 4." aria-describedby="notes-help" class="field mt-2">{ranking.notes}</textarea>
+    </div>
+
+    {/* Back on the left, the way forward on the right, as on every other step. */}
+    <div class="step-buttons flex-row-reverse">
+      <button type="submit" name="do" value="next" class="btn-primary">Next <Icon name="arrow" /></button>
+      <button type="submit" name="do" value="back" class="btn-secondary"><Icon name="left" /> Back</button>
+    </div>
+    <p class="mt-4 text-right text-sm leading-relaxed text-slate-600">One more step: five quick questions, then you send.</p>
+  </form>
+</div>
+
+<script>
+  // Moves a design up or down the order in place, and lets a mouse drag it. Without this the arrows
+  // still work: they are ordinary buttons that reload the page in the new order.
+  const list = document.querySelector<HTMLElement>('[data-rank-list]');
+  const form = list?.closest('form');
+  if (list && form) {
+    const live = document.querySelector<HTMLElement>('[data-rank-live]');
+    const rows = (): HTMLElement[] => [...list.children] as HTMLElement[];
+
+    // After a move: save the new order (the form's own "save as you go" picks it up), mark the row
+    // that moved, and say where it is now.
+    const settle = (row: HTMLElement): void => {
+      form.dispatchEvent(new Event('input', { bubbles: true }));
+      row.classList.remove('just-moved');
+      void row.offsetWidth;
+      row.classList.add('just-moved');
+      const place = rows().indexOf(row) + 1;
+      if (live) live.textContent = `${row.dataset.name} is now number ${place} of ${rows().length}${place === 1 ? ', your first choice' : ''}.`;
+    };
+
+    list.addEventListener('click', (event) => {
+      const button = (event.target as HTMLElement).closest<HTMLButtonElement>('button[name="move"]');
+      const row = button?.closest<HTMLElement>('li');
+      if (!button || !row) return;
+      const up = button.value.startsWith('up');
+      const other = up ? row.previousElementSibling : row.nextElementSibling;
+      event.preventDefault();
+      if (!other) return;
+      if (up) list.insertBefore(row, other);
+      else list.insertBefore(other, row);
+      settle(row);
+      // At the top there is no "up" arrow any more (and no "down" at the bottom): keep focus on the row.
+      const still = getComputedStyle(button).visibility === 'hidden' ? row.querySelector<HTMLElement>(up ? '.move-down' : '.move-up') : button;
+      still?.focus();
+    });
+
+    // Dragging, for a mouse or trackpad. Touch screens use the arrows.
+    if (matchMedia('(pointer: fine)').matches) {
+      let dragging: HTMLElement | null = null;
+      for (const row of rows()) row.draggable = true;
+      list.addEventListener('dragstart', (event) => {
+        dragging = (event.target as HTMLElement).closest<HTMLElement>('li');
+        if (!dragging || !event.dataTransfer) return;
+        event.dataTransfer.effectAllowed = 'move';
+        event.dataTransfer.setData('text/plain', dragging.dataset.name ?? '');
+        dragging.classList.add('is-dragging');
+      });
+      list.addEventListener('dragover', (event) => {
+        if (!dragging) return;
+        event.preventDefault();
+        const over = (event.target as HTMLElement).closest<HTMLElement>('li');
+        if (!over || over === dragging || over.parentElement !== list) return;
+        const box = over.getBoundingClientRect();
+        list.insertBefore(dragging, event.clientY > box.top + box.height / 2 ? over.nextSibling : over);
+      });
+      list.addEventListener('drop', (event) => event.preventDefault());
+      list.addEventListener('dragend', () => {
+        if (!dragging) return;
+        dragging.classList.remove('is-dragging');
+        settle(dragging);
+        dragging = null;
+      });
+    }
+  }
+</script>

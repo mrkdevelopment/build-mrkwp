@@ -3,11 +3,13 @@
 interface Props {
   plain: string;
   payoff?: string;
+  /** `headline` is the smaller size, for a screen whose content should lead, not its title. */
+  size?: 'display' | 'headline';
 }
-const { plain, payoff } = Astro.props;
+const { plain, payoff, size = 'display' } = Astro.props;
 ---
 
-<h1 class="text-3xl leading-[1.1] font-bold sm:text-5xl">
+<h1 class:list={['leading-[1.1] font-bold', size === 'headline' ? 'text-2xl sm:text-4xl' : 'text-3xl sm:text-5xl']}>
   {plain}
   {payoff && <span class="text-signal"> {payoff}</span>}
 </h1>
