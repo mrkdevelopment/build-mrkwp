@@ -2,7 +2,7 @@
 // The stages themselves are set by mrkdevelopment.net (section 2 of REBUILD-SPEC-1-MRKWP-CORE.md).
 
 /** The five steps on the www.mrkwp.com/website-rebuilds/ page. */
-export const STEPS = ['Sign up', 'Your business', 'Five designs', 'Pick and pay', 'Go live'];
+export const STEPS = ['Sign up', 'Your business', 'Five designs', 'Payment', 'Go live'];
 
 export interface StageScreen {
   /** How many of the five steps are finished. The next one is the step the client is on. */
