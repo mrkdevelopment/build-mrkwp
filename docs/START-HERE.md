@@ -263,8 +263,8 @@ cursor moving to the notes box, typing saved across a reload, the accordion and 
 style was blocked. The stand-in's placeholder pictures were blocked, as they should be: they are served
 over plain http, and the policy only allows pictures over https.
 
-**Not checked:** a real phone (touch, swiping the row, the keyboard over the bottom bar); the built app
-with the security policy on; the live site.
+**Not checked:** a real phone (touch, swiping the row, the keyboard over the bottom bar); real pictures in
+the built app; the live site; the booking panel after the job is refreshed from the backend.
 
 **Not built:** showing the price, and payment. After sending, a client sees "We're working out your
 costing" until the job is priced.
