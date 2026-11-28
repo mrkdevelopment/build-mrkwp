@@ -88,3 +88,423 @@
   @apply btn-rise inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-7 py-3.5 text-base font-semibold text-navy hover:border-signal/40;
   min-height: 3rem;
 }
+
+@layer base {
+  /* The parts the browser draws take the palette too. */
+  ::selection { background: rgb(43 89 255 / 0.2); color: var(--color-navy); }
+  html { caret-color: var(--color-signal); scrollbar-color: #cbd5e1 transparent; }
+  h1, h2 { text-wrap: balance; }
+}
+
+/* ---- Your five designs ------------------------------------------------------------------------ */
+
+@layer components {
+  /*
+    The hand of cards. On a phone and tablet it is a row to swipe, the next card peeking in. From a
+    large screen it is a fan: five cards overlapping in an arc, each one lying over the one before it
+    like a hand of playing cards, so every card's number and name stay in view. A card you reach for
+    straightens, rises and comes to the front.
+  */
+  .design-fan {
+    display: flex;
+    gap: 0.875rem;
+    /* Bleeds to the screen edges, with room below so no card's shadow is cut off by the scrolling row. */
+    margin: 0.75rem -1rem -1.25rem;
+    padding: 1.25rem 1rem 3rem;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: 1rem;
+    scrollbar-width: none;
+    &::-webkit-scrollbar { display: none; }
+    &.is-dragging { scroll-snap-type: none; cursor: grabbing; user-select: none; }
+    & > li { flex: 0 0 min(74vw, 17rem); scroll-snap-align: center; }
+    & > li:nth-child(odd) .design-card { rotate: -1.25deg; }
+    & > li:nth-child(even) .design-card { rotate: 1.25deg; }
+  }
+  @media (min-width: 40rem) {
+    .design-fan { margin-inline: -1.5rem; padding-inline: 1.5rem; scroll-padding-inline: 1.5rem; }
+  }
+  /* With a mouse or trackpad the row shows its scrollbar and can be dragged, since there is no finger to swipe it. */
+  @media (pointer: fine) {
+    .design-fan { cursor: grab; scrollbar-width: thin; padding-bottom: 2.25rem; &::-webkit-scrollbar { display: block; height: 8px; } &::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; } }
+  }
+  /* From a tablet up there is room for all five at once: the fan. Nothing to scroll, nothing hidden. */
+  @media (min-width: 48rem) {
+    .design-fan {
+      justify-content: center;
+      gap: 0;
+      margin: 0.5rem 0 0;
+      padding: 1.25rem 0 3.75rem;
+      overflow: visible;
+      scroll-snap-type: none;
+      cursor: auto;
+      & > li { position: relative; flex: 0 0 auto; width: min(18.5vw, 16.5rem); margin-left: -1.25rem; }
+      /* Keep the name clear of the strip the next card lies over. */
+      & > li:not(:last-child) .design-caption, & > li:not(:last-child) .design-marks { padding-right: 1.5rem; }
+      & > li:first-child { margin-left: 0; }
+      & > li:nth-child(1) { z-index: 1; & .design-card { rotate: -6deg; translate: 0 2.5rem; } }
+      & > li:nth-child(2) { z-index: 2; & .design-card { rotate: -3deg; translate: 0 0.75rem; } }
+      & > li:nth-child(3) { z-index: 3; & .design-card { rotate: 0deg; translate: 0 0; } }
+      & > li:nth-child(4) { z-index: 4; & .design-card { rotate: 3deg; translate: 0 0.75rem; } }
+      & > li:nth-child(5) { z-index: 5; & .design-card { rotate: 6deg; translate: 0 2.5rem; } }
+      & > li:hover, & > li:focus-within { z-index: 10; }
+      & > li .design-card:focus-visible { rotate: 0deg; translate: 0 -0.75rem; }
+    }
+    @media (hover: hover) {
+      .design-fan > li .design-card:hover { rotate: 0deg; translate: 0 -0.75rem; }
+    }
+  }
+
+  /*
+    One card: the design mounted on white card stock, like a print. The picture keeps square corners
+    and sits inside a margin, so no part of the design is ever cut by a rounded corner.
+  */
+  .design-card {
+    /* `--ring` is the liked outline. It is part of the shadow so it holds through hover and never shifts the card. */
+    --ring: 0 0 0 0 transparent;
+    position: relative;
+    display: block;
+    padding: 0.625rem 0.625rem 0.875rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 1rem;
+    background: #fff;
+    box-shadow: var(--ring), 0 1px 2px rgb(10 37 64 / 0.06), 0 12px 26px -16px rgb(10 37 64 / 0.32);
+    transition: rotate 200ms cubic-bezier(0.16, 1, 0.3, 1), translate 200ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 200ms cubic-bezier(0.16, 1, 0.3, 1), border-color 200ms;
+    -webkit-user-drag: none;
+    &:focus-visible { border-color: #cbd5e1; box-shadow: var(--ring), 0 2px 4px rgb(10 37 64 / 0.08), 0 26px 44px -20px rgb(10 37 64 / 0.45); }
+    @media (hover: hover) {
+      &:hover { border-color: #cbd5e1; box-shadow: var(--ring), 0 2px 4px rgb(10 37 64 / 0.08), 0 26px 44px -20px rgb(10 37 64 / 0.45); }
+    }
+    @media (prefers-reduced-motion: reduce) { transition: none; }
+  }
+  /* A liked card is stamped: a green badge on its corner, a green outline, and a filled "Liked" label. */
+  .stamp-like {
+    /* Top left: in the fan each card lies over the right edge of the one before, so the left corner is always in view. */
+    position: absolute;
+    top: -0.75rem;
+    left: -0.75rem;
+    z-index: 1;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border: 3px solid #fff;
+    border-radius: 9999px;
+    background: var(--color-teal-ink);
+    color: #fff;
+    box-shadow: 0 6px 14px -6px rgb(10 37 64 / 0.5);
+  }
+  .design-thumb {
+    display: block;
+    aspect-ratio: 4 / 5;
+    overflow: hidden;
+    background: #f1f5f9;
+    box-shadow: inset 0 0 0 1px rgb(10 37 64 / 0.08);
+    & img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: top; }
+  }
+  .design-caption { display: flex; align-items: baseline; gap: 0.5rem; margin-top: 0.75rem; padding-inline: 0.25rem; }
+  .design-name { @apply font-display text-lg leading-tight font-bold text-navy; letter-spacing: -0.025em; }
+  /* The design's number: clients refer to designs by it ("the colours from 2"). */
+  .design-num {
+    @apply inline-flex shrink-0 items-center justify-center rounded-md bg-slate-100 text-sm font-bold text-navy tabular-nums;
+    min-width: 1.5rem;
+    height: 1.5rem;
+    font-family: var(--font-body);
+    letter-spacing: 0;
+  }
+  .design-marks { display: block; margin-top: 0.5rem; padding-inline: 0.25rem; min-height: 1.5rem; }
+
+  /* The mark on a card: not opened yet, liked or disliked. Which one shows follows the choice made inside. */
+  .mark { @apply items-center gap-1.5 text-sm font-semibold; }
+  .mark-none { @apply inline-flex text-signal; }
+  .mark-like { @apply hidden rounded-full bg-teal-ink px-3 py-1 text-white; }
+  .mark-dislike { @apply hidden text-slate-600; }
+  .designs-form:has(#like-1:checked) [data-card="1"] .mark-like,
+  .designs-form:has(#like-2:checked) [data-card="2"] .mark-like,
+  .designs-form:has(#like-3:checked) [data-card="3"] .mark-like,
+  .designs-form:has(#like-4:checked) [data-card="4"] .mark-like,
+  .designs-form:has(#like-5:checked) [data-card="5"] .mark-like { display: inline-flex; }
+  .designs-form:has(#like-1:checked) [data-card="1"] .stamp-like,
+  .designs-form:has(#like-2:checked) [data-card="2"] .stamp-like,
+  .designs-form:has(#like-3:checked) [data-card="3"] .stamp-like,
+  .designs-form:has(#like-4:checked) [data-card="4"] .stamp-like,
+  .designs-form:has(#like-5:checked) [data-card="5"] .stamp-like { display: flex; }
+  .designs-form:has(#like-1:checked) [data-card="1"],
+  .designs-form:has(#like-2:checked) [data-card="2"],
+  .designs-form:has(#like-3:checked) [data-card="3"],
+  .designs-form:has(#like-4:checked) [data-card="4"],
+  .designs-form:has(#like-5:checked) [data-card="5"] { --ring: 0 0 0 3px var(--color-teal-ink); border-color: var(--color-teal-ink); }
+  .designs-form:has(#dislike-1:checked) [data-card="1"] .mark-dislike,
+  .designs-form:has(#dislike-2:checked) [data-card="2"] .mark-dislike,
+  .designs-form:has(#dislike-3:checked) [data-card="3"] .mark-dislike,
+  .designs-form:has(#dislike-4:checked) [data-card="4"] .mark-dislike,
+  .designs-form:has(#dislike-5:checked) [data-card="5"] .mark-dislike { display: inline-flex; }
+  .designs-form:has(#like-1:checked, #dislike-1:checked) [data-card="1"] .mark-none,
+  .designs-form:has(#like-2:checked, #dislike-2:checked) [data-card="2"] .mark-none,
+  .designs-form:has(#like-3:checked, #dislike-3:checked) [data-card="3"] .mark-none,
+  .designs-form:has(#like-4:checked, #dislike-4:checked) [data-card="4"] .mark-none,
+  .designs-form:has(#like-5:checked, #dislike-5:checked) [data-card="5"] .mark-none { display: none; }
+  .designs-form:has(#dislike-1:checked) [data-card="1"] .design-thumb img,
+  .designs-form:has(#dislike-2:checked) [data-card="2"] .design-thumb img,
+  .designs-form:has(#dislike-3:checked) [data-card="3"] .design-thumb img,
+  .designs-form:has(#dislike-4:checked) [data-card="4"] .design-thumb img,
+  .designs-form:has(#dislike-5:checked) [data-card="5"] .design-thumb img { opacity: 0.45; filter: grayscale(1); }
+
+  /* The same marks once the choices are sent, when each card carries its choice itself. */
+  .design-card[data-pick='like'] { --ring: 0 0 0 3px var(--color-teal-ink); border-color: var(--color-teal-ink); }
+  .design-card[data-pick='like'] .mark-like { display: inline-flex; }
+  .design-card[data-pick='like'] .stamp-like { display: flex; }
+  .design-card[data-pick='dislike'] .mark-dislike { display: inline-flex; }
+  .design-card[data-pick='dislike'] .design-thumb img { opacity: 0.45; filter: grayscale(1); }
+  .design-card[data-pick] .mark-none { display: none; }
+
+  /* ---- A design opened large. Shown only while it is the page's target (its card was pressed). ---- */
+  .design-detail { display: none; position: fixed; inset: 0; z-index: 50; }
+  .design-detail:target { display: flex; }
+  html:has(.design-detail:target) { overflow: hidden; }
+  .design-backdrop { position: absolute; inset: 0; background: rgb(10 37 64 / 0.72); cursor: default; }
+  .design-panel { position: relative; display: flex; flex-direction: column; width: 100%; height: 100dvh; background: #fff; }
+
+  /*
+    The bar belongs to the design. On a phone: the pager and Close on one line, then the name, then
+    its one-sentence idea. From a large screen: name on the left, pager and Close on the right.
+  */
+  .design-bar {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas: "pager close" "title title" "idea idea";
+    align-items: center;
+    gap: 0.5rem 0.5rem;
+    padding: 0.5rem 0.5rem 0.875rem 1rem;
+    border-bottom: 1px solid #e2e8f0;
+  }
+  .design-title { @apply text-2xl leading-tight font-bold; grid-area: title; padding-right: 0.5rem; }
+  .design-idea { @apply leading-snug text-slate-600; grid-area: idea; padding-right: 0.5rem; }
+  .design-close { grid-area: close; }
+  /* One control: step back, "Design 2 of 5", step forward. It pages the designs, so it sits with the design's name. */
+  .design-pager {
+    @apply inline-flex items-center rounded-xl border border-slate-300 bg-white;
+    grid-area: pager;
+    justify-self: start;
+    margin-left: -0.25rem;
+  }
+  .design-count { @apply px-1 text-sm font-semibold whitespace-nowrap text-navy tabular-nums; }
+  .icon-button {
+    @apply inline-flex items-center justify-center rounded-lg text-navy;
+    width: 2.75rem;
+    height: 2.75rem;
+    &:hover { background: #f1f5f9; }
+  }
+
+  /* On a phone the whole view scrolls as one, with the choice held at the bottom of the screen. */
+  .design-body { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; }
+  .design-stage { padding: 0.875rem 1rem 1.25rem; background: #f1f5f9; }
+  .design-decide {
+    position: sticky;
+    bottom: 0;
+    z-index: 1;
+    padding: 0.75rem 1rem max(0.75rem, env(safe-area-inset-bottom));
+    border-top: 1px solid #e2e8f0;
+    background: #fff;
+    box-shadow: 0 -10px 24px -18px rgb(10 37 64 / 0.4);
+  }
+  .decide-legend { @apply sr-only; }
+  /* The folding part of the side bar: the client's notes, and "About this design". One open at a time. */
+  .design-more { padding: 0.5rem 1rem 0; }
+  .more-panel { border-bottom: 1px solid #e2e8f0; }
+  .more-panel:first-child { border-top: 1px solid #e2e8f0; }
+  .more-summary {
+    @apply flex cursor-pointer items-center justify-between gap-3 font-semibold text-navy;
+    min-height: 3rem;
+    list-style: none;
+    &::-webkit-details-marker { display: none; }
+  }
+  .more-title { @apply flex items-center gap-2.5; }
+  .more-icon { @apply h-5 w-5 shrink-0 text-slate-500; }
+  .more-chevron { flex: none; color: #64748b; transition: rotate 180ms cubic-bezier(0.16, 1, 0.3, 1); @media (prefers-reduced-motion: reduce) { transition: none; } }
+  .more-panel[open] .more-chevron { rotate: 180deg; }
+  .more-body { padding-bottom: 1.25rem; }
+  /* A quiet "Added" beside "Your notes" once something has been written, so a folded panel still shows it holds a note. */
+  .more-added { @apply ml-2 hidden text-sm font-semibold text-teal-ink; }
+  .more-panel:has(textarea:not(:placeholder-shown)) .more-added { display: inline; }
+  .design-next { display: flex; justify-content: flex-end; padding: 1.25rem 1rem 1.5rem; }
+  .design-next > a { white-space: nowrap; }
+
+  /* With room for two columns: a panel with the picture on the left and the choice, always in view, on the right. */
+  @media (min-width: 52rem) {
+    .design-detail { align-items: center; justify-content: center; padding: 1.5rem; }
+    .design-panel { width: min(100%, 88rem); height: calc(100dvh - 3rem); overflow: hidden; border-radius: 1.5rem; box-shadow: 0 30px 80px -20px rgb(10 37 64 / 0.6); }
+    .design-bar {
+      grid-template-columns: minmax(0, 1fr) auto auto;
+      grid-template-areas: "title pager close" "idea idea idea";
+      gap: 0.25rem 0.75rem;
+      padding: 0.75rem 1rem 1rem 1.5rem;
+    }
+    .design-pager { justify-self: end; margin-left: 0; }
+    .design-idea { max-width: 62rem; }
+    .design-body {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) clamp(19rem, 30vw, 24rem);
+      /* Side column, top to bottom: the choice, the folding panels (which scroll if they must), then the way on. */
+      grid-template-rows: auto minmax(0, 1fr) auto;
+      overflow: hidden;
+    }
+    .design-stage { grid-column: 1; grid-row: 1 / -1; padding: 1.25rem 1.5rem 2rem; border-right: 1px solid #e2e8f0; overflow-y: auto; scrollbar-width: thin; }
+    .design-decide { position: static; grid-column: 2; grid-row: 1; padding: 1.5rem 1.5rem 0; border-top: 0; box-shadow: none; }
+    .design-more { grid-column: 2; grid-row: 2; margin-top: 1rem; padding: 0 1.5rem; overflow-y: auto; scrollbar-width: thin; }
+    .decide-legend { @apply not-sr-only mb-3 block font-semibold text-navy; }
+    .design-next { grid-column: 2; grid-row: 3; padding: 1rem 1.5rem; border-top: 1px solid #e2e8f0; }
+  }
+
+  /* The picture itself: square corners, so nothing of the design is cut off. */
+  .design-shot {
+    display: block;
+    margin-inline: auto;
+    background: #fff;
+    box-shadow: 0 0 0 1px rgb(10 37 64 / 0.1), 0 18px 40px -24px rgb(10 37 64 / 0.45);
+    & img { display: block; width: 100%; height: auto; }
+  }
+  .shot-desktop { max-width: 68rem; }
+  .shot-phone { max-width: 24.375rem; }
+
+  /* Computer / Phone: one picture at a time, large. A phone starts on the phone view; anything wider starts on the computer view. */
+  .view-switch { @apply mx-auto mb-3.5 flex w-fit rounded-xl border border-slate-300 bg-white p-1; }
+  .view-option {
+    @apply flex cursor-pointer items-center gap-2 rounded-lg px-4 text-sm font-semibold text-slate-600;
+    min-height: 2.75rem;
+    &:has(:focus-visible) { outline: 2px solid var(--color-signal); outline-offset: 2px; }
+  }
+  .view-option:has(:checked) { @apply bg-navy text-white; }
+  .design-stage:not(:has(.view-option :checked)) .view-phone { @apply bg-navy text-white; }
+  .design-stage .shot-desktop { display: none; }
+  .design-stage:has(.view-desktop :checked) .shot-desktop { display: block; }
+  .design-stage:has(.view-desktop :checked) .shot-phone { display: none; }
+  @media (min-width: 40rem) {
+    .design-stage:not(:has(.view-option :checked)) .view-phone { background: transparent; color: #475569; }
+    .design-stage:not(:has(.view-option :checked)) .view-desktop { @apply bg-navy text-white; }
+    .design-stage:not(:has(.view-option :checked)) .shot-desktop { display: block; }
+    .design-stage:not(:has(.view-option :checked)) .shot-phone { display: none; }
+  }
+
+  /* Like and Dislike: two large buttons, one of which stays pressed. */
+  .choice {
+    @apply flex cursor-pointer items-center justify-center gap-2 rounded-xl border-2 border-slate-300 bg-white px-4 text-base font-bold text-navy;
+    min-height: 3.25rem;
+    transition: background-color 180ms, border-color 180ms, color 180ms;
+    &:hover { border-color: var(--color-navy); }
+    &:has(:focus-visible) { outline: 2px solid var(--color-signal); outline-offset: 2px; }
+  }
+  .choice-like:has(:checked) { @apply border-teal-ink bg-teal-ink text-white; }
+  .choice-dislike:has(:checked) { @apply border-navy bg-navy text-white; }
+
+  /* The two notes boxes on a design, and a note shown back (on the review and thank-you screens). */
+  .note-label { @apply mt-4 flex items-center gap-2 font-semibold text-navy; }
+  .note-line { @apply mt-2 flex items-start gap-2 leading-relaxed; }
+  .note-icon { @apply mt-1 h-4 w-4 shrink-0 text-slate-500; }
+
+  /* The foot of the designs screen. The Review button only exists once there is something to review. */
+  .designs-foot { display: flex; flex-direction: column; align-items: center; gap: 0.5rem; margin-top: 0.5rem; text-align: center; }
+  .review-hint { @apply text-slate-600; }
+  .designs-form:has(.choice-like :checked) .review-hint { display: none; }
+
+  /*
+    The review screen: one row per design the client liked. With more than one (`is-ranked`) the
+    list is their order of preference: each row has its place between an up and a down arrow.
+  */
+  .review-list { @apply rounded-2xl border border-slate-200 bg-white; counter-reset: place; }
+  .review-row {
+    display: grid;
+    grid-template-columns: 4.5rem minmax(0, 1fr) auto;
+    align-items: start;
+    gap: 0.5rem 1rem;
+    padding: 1rem;
+    counter-increment: place;
+    &:not(:first-child) { border-top: 1px solid #e2e8f0; }
+    &:first-child { border-radius: 1rem 1rem 0 0; }
+    &:last-child { border-radius: 0 0 1rem 1rem; }
+  }
+  .review-thumb {
+    display: block;
+    aspect-ratio: 4 / 5;
+    overflow: hidden;
+    background: #f1f5f9;
+    box-shadow: 0 0 0 1px rgb(10 37 64 / 0.1);
+    & img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: top; }
+  }
+  .review-body { min-width: 0; }
+
+  /* On a phone the Change button sits under the notes, so the notes keep the width. */
+  .is-ranked .review-row {
+    grid-template-columns: 2.75rem 3.75rem minmax(0, 1fr);
+    grid-template-areas: "place thumb body" "place thumb change";
+    gap: 0.5rem 0.75rem;
+    padding-left: 0.5rem;
+  }
+  .is-ranked .rank-control { grid-area: place; }
+  .is-ranked .review-thumb { grid-area: thumb; }
+  .is-ranked .review-body { grid-area: body; }
+  .is-ranked .review-change { grid-area: change; justify-self: start; }
+  @media (min-width: 40rem) {
+    .is-ranked .review-row {
+      grid-template-columns: 2.75rem 4.5rem minmax(0, 1fr) auto;
+      grid-template-areas: "place thumb body change";
+      gap: 0.5rem 1rem;
+    }
+    .is-ranked .review-change { justify-self: auto; }
+  }
+
+  /* The place in the order: up, the number, down. The number is counted by the list, so it follows any move. */
+  .rank-control { display: flex; flex-direction: column; align-items: center; }
+  .rank-number {
+    @apply font-display text-xl leading-none font-bold text-navy tabular-nums;
+    &::before { content: counter(place); }
+  }
+  /* No arrow where there is nowhere to go: the first can't move up, the last can't move down. */
+  .is-ranked > li:first-child .move-up, .is-ranked > li:last-child .move-down { visibility: hidden; }
+  /* Only the top row is the first choice. */
+  .first-choice { @apply mt-2 w-fit rounded-full bg-teal-ink px-3 py-1 text-sm font-semibold text-white; display: none; }
+  .is-ranked > li:first-child .first-choice { display: block; }
+
+  /* Dragging with a mouse. */
+  .review-row[draggable='true'] { cursor: grab; }
+  .review-row.is-dragging { opacity: 0.45; cursor: grabbing; }
+  .review-row.just-moved { animation: just-moved 900ms cubic-bezier(0.16, 1, 0.3, 1); }
+  .drag-hint { display: none; }
+  @media (pointer: fine) { .drag-hint { display: inline; } }
+  @media (prefers-reduced-motion: reduce) { .review-row.just-moved { animation: none; } }
+
+  /* The costing questions: one after another, parted by a rule, each a short list of answers to tap. */
+  .need { padding-block: 1.5rem; }
+  .need + .need { border-top: 1px solid #e2e8f0; }
+  .need-ask { @apply flex items-start gap-2.5 font-display text-lg leading-snug font-bold text-navy; letter-spacing: -0.025em; }
+  .need-help { @apply mt-1.5 text-sm leading-relaxed text-slate-600; padding-left: 2.125rem; }
+  .need-options { @apply mt-3 grid gap-2; }
+  @media (min-width: 40rem) { .need-options { padding-left: 2.125rem; } }
+  .option {
+    @apply flex cursor-pointer items-center gap-3 rounded-xl border border-slate-300 bg-white px-4 text-base text-navy;
+    min-height: 3rem;
+    transition: border-color 180ms, background-color 180ms;
+    &:hover { border-color: #64748b; }
+    &:has(:focus-visible) { outline: 2px solid var(--color-signal); outline-offset: 2px; }
+    &:has(:checked) { @apply border-navy bg-slate-100 font-semibold; }
+    & input { width: 1.125rem; height: 1.125rem; flex: none; accent-color: var(--color-navy); }
+  }
+  /* A short follow-on box that appears once its answer is chosen: "Which one?" for a CRM, "When is a good time?" for a call. */
+  .need-where, .need-when { display: none; margin-top: 0.875rem; }
+  @media (min-width: 40rem) { .need-where, .need-when { padding-left: 2.125rem; } }
+  .need:has(input[value='crm']:checked) .need-where { display: block; }
+  .need:has(input[value='call']:checked) .need-when { display: block; }
+}
+
+/*
+  A button that can't be used isn't shown: "Review my choices" only exists once a design is liked.
+  This rule sits outside the layers above on purpose, so it outranks the button's own display.
+*/
+.designs-form:not(:has(.choice-like :checked)) .review-button { display: none; }
+
+/* A row that has just moved is tinted for a moment, so the eye can follow it. */
+@keyframes just-moved {
+  from { background-color: rgb(15 118 110 / 0.14); }
+  to { background-color: transparent; }
+}

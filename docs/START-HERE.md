@@ -178,6 +178,97 @@ after the deploy went out without them and every link showed an error. Any later
 deploy command in Cloudflare changed to run it first. 1.1.1 has no new tables. The booking link for the free call is Matt's
 Google Calendar booking page, set in `src/products/rebuild/config.ts` until the backend's `GET /config` exists.
 
+## Phase 3: "Your five designs" (version 1.2.0, built 28 Nov 2026, not deployed)
+
+On branch `1.2.0`. A job at `designs_ready` shows its five designs instead of a holding message.
+
+- **Where the designs come from.** mrkwp-core 1.8.5 puts them on the job this app reads: five of
+  `{position, name, idea, notes, desktop, mobile}`, each picture `{url, width, height}`. This app asks for
+  the job as it always has (first visit, then whenever its copy is over a minute old). Nothing is copied.
+- **Pictures are shown straight from their `url`,** and only when it is on the same site as
+  `BUILD_API_URL` (mrkdevelopment.net or a sub-domain of it), over https. Anything else is left out.
+- **Like or Dislike first, then an order for the liked ones** (Matt, 28 Nov 2026). A card opens the design large, where the client
+  presses Like or Dislike. Every design has two notes boxes in the side bar, whatever was chosen: "What
+  do you like?" and "What do you dislike?". The side bar below the choice is an accordion ("Your notes",
+  "About this design"): two `<details>` sharing a `name`, so the browser keeps one open at a time with no
+  script.
+- **Icons** are Lucide's (`@lucide/astro`, added 28 Nov 2026 at Matt's request). `src/components/Icon.astro`
+  is the one place they are named: import the icon from `@lucide/astro/icons/<its-name>` and add it there.
+- **The layout** (redone 28 Nov 2026 with the Impeccable design skill, after two rounds of Matt's review).
+  From 768px wide the five cards are a fan: overlapping, tilted, each lying over the one before so every
+  number and name shows. Narrower, they are a row to swipe (a mouse can drag it, and sees a scrollbar).
+  The opened design shows one picture at a time with a Computer / Phone switch. Its pager ("Design 2 of
+  5", going round) is in the header with the design's name, never beside the picture. From 832px the
+  choice sits beside the picture; narrower, it is a bar held at the bottom. Pictures have square corners
+  and are never clipped.
+- **Four steps, one stage.** Choosing (`Designs.astro`); "Check your choices" (`DesignsReview.astro`: only
+  the liked designs, their order, and the "Anything else?" box); "A few last questions, then send"
+  (`DesignsNeeds.astro`); then sent. `ranking.step` in the saved record says which; `designsScreen()` in
+  `src/lib/designs.ts` reads it. **Nothing is queued for mrkdevelopment.net until "Send my choices" on the
+  questions step**: the endpoint turns a `send` from anywhere earlier into the next step, and refuses it
+  until every question is answered.
+- **The five costing questions** (Matt, 28 Nov 2026) are in `src/lib/needs.ts`: `forms`, `enquiries` (with
+  `enquiries_where` when the answer is a CRM or another system), `editing`, `support`, `technical`. Each
+  has an "I'm not sure". They take the place of the specification's Extras screen (care plan, hosting,
+  help with domain and email), and the team works out the price from them, not the app. **Ask Matt
+  whether `docs/SPECIFICATION.md` should be changed to say so.**
+- **A sixth question asks about going over the design with Matt** before payment (`followup`: `meet`,
+  `call` or `none`; `followup_when` is a good time to call). After sending, `FollowUp.astro` shows a
+  button to Matt's booking calendar for `meet`, or "Matt will call you" for `call`. It reads the answer
+  from the record kept here, so it survives the job being refreshed. **This app tells nobody.** Matt
+  hearing about a call request, and the note in FluentCRM, are for mrkwp-core to do when it takes the
+  `ranking` action: ask Matt to include that.
+- **Sending finishes the designs step.** One `ranking` action carries both the choices and the answers
+  (`{ranking: {...}, needs: {...}}`), and the job becomes `ranked` here: "Thanks. We're working out your
+  costing", plus a line that further rounds of feedback are a paid video meeting. There is no way to
+  reopen the choices afterwards.
+- **No button that can't be used.** "Review my choices" is hidden by CSS until a design is liked.
+- **It needs no script.** A card is a link to `#design-3` and CSS shows the matching view; the mark on a
+  card, the "what do you like" box, the Computer / Phone switch and the Review button follow the choices
+  through CSS (`:target` and `:has()`). The script in `Designs.astro` adds Escape, the arrow keys, focus,
+  and dragging the row with a mouse.
+- **Two knowing departures from `DESIGN.md`,** both at Matt's request: the fanned cards carry a soft shadow
+  at rest (the design system keeps resting cards flat), and they tilt. Everything else follows it.
+- **What is sent.** Sending needs at least one Like and queues a `ranking` action:
+  `{ranking: {order, rejected, feedback, notes, ranked_at}}`. `order` is the liked positions, **first
+  choice first**, as the contract always described it: the first is the basis for the build. `rejected`
+  is the disliked ones. `feedback` is a list of `{position, choice, likes, dislikes}` for every design the
+  client chose on or wrote about: `choice` is `like`, `dislike` or empty; `likes` and `dislikes` are their
+  two notes on that design (a liked design can have dislikes). `notes` is the one "Anything else?" box.
+  **For the contract, before the backend's `ranking` action is built: it has no `feedback` or `needs`
+  yet; it has `ranking` leave the job at `designs_ready` and a separate `extras` action (with price lines
+  worked out by the app) move it to `ranked`. This app now sends one action and expects `ranked`.** 
+
+Where things are: `src/lib/designs.ts` (reading designs, checking a ranking),
+`src/pages/api/job/designs.ts` (the buttons), `src/products/rebuild/Designs.astro` (the screen).
+
+**Waiting on the backend.** mrkwp-core 1.8.5 does not take `ranking` yet (it answers "accepts: confirm,
+details, goals"). A sent ranking waits in the outbox and is retried each hour. **Ask Matt for the
+`ranking` action**, and for a place on the job's page to show it.
+
+**Checked (28 Nov 2026):** 30 tests. In the local app against the stand-in backend, with five made-up
+designs: the five cards fan across at 1440 wide; a card opens its design large; Like shows the
+"what do you like" box and marks the card; sending with no Like is turned back with a plain message;
+choices and comments save as they are made; a sent set reaches the backend once; "Change my choices"
+reopens it.
+
+**Checked with RB-1002's real designs** (the local app reading the live backend): all pictures load at
+1440, 960, 700 and 375 wide; the fan at 960; the row dragged with a mouse at 700; the review screen; no
+sideways scrolling. Against the stand-in backend: review refused with no Like; `send` from the choosing
+screen only reaches the review; Change beside a design reopens that design; one `ranking` reaches the
+backend however often Send is pressed.
+
+**Checked in the built app with the security policy on** (the made-up job): opening a design, Like, the
+cursor moving to the notes box, typing saved across a reload, the accordion and the icons. No script or
+style was blocked. The stand-in's placeholder pictures were blocked, as they should be: they are served
+over plain http, and the policy only allows pictures over https.
+
+**Not checked:** a real phone (touch, swiping the row, the keyboard over the bottom bar); real pictures in
+the built app; the live site; the booking panel after the job is refreshed from the backend.
+
+**Not built:** showing the price, and payment. After sending, a client sees "We're working out your
+costing" until the job is priced.
+
 ## Before any code: three things from Matt
 
 **State on 27 Nov 2026:** the account is chosen (**MRK WP**, set in `wrangler.jsonc`). The service account
@@ -278,7 +369,8 @@ Done when: the link in a real confirm email opens the welcome screen on a phone;
 job to `confirmed`; a wrong code shows the "isn't right" page; another job's number with this session
 shows nothing; and with mrkdevelopment.net unreachable, a job already opened still opens.
 
-Phase 2, "Your business" and the scans, is built: see the section above. Next is phase 3, the designs,
+Phase 2, "Your business" and the scans, is built: see the section above. Phase 3, the designs, is built
+as far as ranking. It was the phase
 which needs the backend's designs upload (see "What the backend does not offer yet"). Read
 `docs/briefs/DESIGNS-1-MRKWP-CORE.md` first: the designs step was simplified on 28 Nov 2026.
 

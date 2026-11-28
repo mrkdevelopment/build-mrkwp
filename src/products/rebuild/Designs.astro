@@ -1,0 +1,299 @@
+---
+// "Your five designs". The five designs are the screen: a hand of cards fanned across the page, or
+// a row to swipe on a phone. A card opens that design large, where the client presses Like or
+// Dislike and says what they like or dislike about it. "Review my choices" leads to a last look
+// (DesignsReview.astro); nothing is sent from this screen.
+//
+// It works without any script. A card is a link to `#design-3`, and CSS shows the matching view
+// while it is the page's target; Close is a link back to `#designs`. The mark on a card, the
+// Computer / Phone switch and the Review button are all switched by CSS from the choices made. The script at the bottom adds keys (Escape, arrows), moves keyboard
+// focus, and lets a mouse drag the row of cards on a narrow screen.
+import Heading from '../../components/Heading.astro';
+import Icon from '../../components/Icon.astro';
+import { rankOrder, type Design, type RankingDraft } from '../../lib/designs.ts';
+
+interface Props {
+  designs: Design[];
+  ranking: RankingDraft;
+}
+const { designs, ranking } = Astro.props;
+const sent = ranking.sent_at !== '';
+const pickOf = (design: Design): string => ranking.picks[String(design.position)] ?? '';
+const likesOf = (design: Design): string => ranking.likes[String(design.position)] ?? '';
+const dislikesOf = (design: Design): string => ranking.dislikes[String(design.position)] ?? '';
+// Once sent, the first choice is named back to them.
+const first = designs.find((design) => design.position === rankOrder(ranking.rank, ranking.picks, designs)[0]);
+const likedCount = designs.filter((design) => pickOf(design) === 'like').length;
+const after = (i: number): Design | null => designs[i + 1] ?? null;
+// The pager goes round: back from the first design is the last one, so neither arrow is ever a dead end.
+const round = (i: number, step: number): Design => designs[(i + step + designs.length) % designs.length];
+---
+
+<div class="mx-auto max-w-2xl text-center">
+  {
+    sent ? (
+      <>
+        <Heading size="headline" plain="Thanks." payoff="We're working out your costing." />
+        <p class="mt-3 text-lg leading-relaxed">
+          {first ? <>We'll build from <strong class="font-semibold text-navy">{first.name}</strong>{likedCount > 1 ? ' and bring in what you liked from the others' : ''}.</> : 'We have your design choices.'} We're working out the cost to deliver your website, and we'll email you when it's ready.
+        </p>
+        <p class="mt-3 leading-relaxed">Any further rounds of feedback can be booked as a paid video meeting.</p>
+      </>
+    ) : (
+      <>
+        <Heading size="headline" plain="Your five designs" payoff="are ready." />
+        <p class="mt-3 text-lg leading-relaxed">
+          Open each one and tell us whether you like it. <strong class="font-semibold text-navy">You can mix and match:</strong> like more than one, and say which part you want from each.
+        </p>
+      </>
+    )
+  }
+  {ranking.error && <p role="alert" class="mt-4 rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-left leading-relaxed text-amber-900">{ranking.error}</p>}
+</div>
+
+<form id="designs" method="post" action="/api/job/designs" class="designs-form" data-keep>
+  {/* The hand of cards. */}
+  <ol class="design-fan">
+    {
+      designs.map((design) => (
+        <li>
+          {/* While choosing, the card's mark follows the Like / Dislike inside it. Once sent there is nothing to follow, so the choice is written on the card. */}
+          <a href={`#design-${design.position}`} class="design-card" data-card={design.position} data-pick={sent && pickOf(design) ? pickOf(design) : undefined} draggable="false" aria-label={`Open design ${design.position}, ${design.name}`}>
+            <span class="stamp-like" aria-hidden="true"><Icon name="like" class="h-5 w-5" /></span>
+            <span class="design-thumb">{design.desktop && <img src={design.desktop.url} alt="" loading="lazy" referrerpolicy="no-referrer" draggable="false" />}</span>
+            <span class="design-caption">
+              <span class="design-num">{design.position}</span>
+              <span class="design-name">{design.name}</span>
+            </span>
+            <span class="design-marks">
+              <span class="mark mark-none">Open <Icon name="arrow" /></span>
+              <span class="mark mark-like"><Icon name="like" /> Liked</span>
+              <span class="mark mark-dislike"><Icon name="dislike" /> Disliked</span>
+            </span>
+          </a>
+        </li>
+      ))
+    }
+  </ol>
+
+  {/* One large view per design, shown when its card is opened. */}
+  {
+    designs.map((design, i) => (
+      <section id={`design-${design.position}`} class="design-detail" aria-label={`Design ${design.position}: ${design.name}`}>
+        <a href="#designs" class="design-backdrop" tabindex="-1" aria-hidden="true" />
+        <div class="design-panel">
+          {/* The bar belongs to the design: its name, the step to the design before or after, and Close. */}
+          <header class="design-bar">
+            <h2 class="design-title">{design.name}</h2>
+            <nav class="design-pager" aria-label="Step through the five designs">
+              <a href={`#design-${round(i, -1).position}`} class="icon-button" data-prev aria-label={`Previous design: ${round(i, -1).name}`}><Icon name="left" class="h-5 w-5" /></a>
+              <span class="design-count">Design {design.position} of {designs.length}</span>
+              <a href={`#design-${round(i, 1).position}`} class="icon-button" data-next aria-label={`Next design: ${round(i, 1).name}`}><Icon name="right" class="h-5 w-5" /></a>
+            </nav>
+            <a href="#designs" class="icon-button design-close" data-close aria-label="Close and go back to all five"><Icon name="close" class="h-5 w-5" /></a>
+            {design.idea && <p class="design-idea">{design.idea}</p>}
+          </header>
+
+          <div class="design-body">
+            {/* The picture: one at a time, with a switch between the computer and phone views of this design. */}
+            <div class="design-stage">
+              <div class="view-switch" role="group" aria-label="Show this design on">
+                <label class="view-option view-desktop">
+                  <input type="radio" name={`view-${design.position}`} value="desktop" form="no-form" class="sr-only" />
+                  <Icon name="computer" /> Computer
+                </label>
+                <label class="view-option view-phone">
+                  <input type="radio" name={`view-${design.position}`} value="phone" form="no-form" class="sr-only" />
+                  <Icon name="phone" /> Phone
+                </label>
+              </div>
+              {design.desktop && (
+                <a href={design.desktop.url} target="_blank" rel="noopener" class="design-shot shot-desktop" aria-label={`${design.name} on a computer: open the picture full size in a new tab`}>
+                  <img src={design.desktop.url} width={design.desktop.width || undefined} height={design.desktop.height || undefined} alt={`${design.name} on a computer`} loading="lazy" referrerpolicy="no-referrer" />
+                </a>
+              )}
+              {design.mobile && (
+                <a href={design.mobile.url} target="_blank" rel="noopener" class="design-shot shot-phone" aria-label={`${design.name} on a phone: open the picture full size in a new tab`}>
+                  <img src={design.mobile.url} width={design.mobile.width || undefined} height={design.mobile.height || undefined} alt={`${design.name} on a phone`} loading="lazy" referrerpolicy="no-referrer" />
+                </a>
+              )}
+            </div>
+
+            {/* The choice. On a phone this bar stays at the bottom of the screen while the picture scrolls. */}
+            {sent ? (
+              <div class="design-decide">
+                <p class="flex items-center gap-2 font-semibold text-navy">
+                  {pickOf(design) === 'like' && <><Icon name="like" class="h-5 w-5 text-teal-ink" /> You liked this one</>}
+                  {pickOf(design) === 'dislike' && <><Icon name="dislike" class="h-5 w-5" /> You disliked this one</>}
+                  {pickOf(design) === '' && "You didn't say"}
+                </p>
+                {likesOf(design) && <p class="note-line"><Icon name="like" class="note-icon text-teal-ink" /> <span class="whitespace-pre-line">{likesOf(design)}</span></p>}
+                {dislikesOf(design) && <p class="note-line"><Icon name="dislike" class="note-icon" /> <span class="whitespace-pre-line">{dislikesOf(design)}</span></p>}
+              </div>
+            ) : (
+              <div class="design-decide" role="group" aria-labelledby={`decide-${design.position}`}>
+                <p id={`decide-${design.position}`} class="decide-legend">What do you think of it?</p>
+                <div class="grid grid-cols-2 gap-3">
+                  <label class="choice choice-like">
+                    <input type="radio" name={`pick:${design.position}`} value="like" id={`like-${design.position}`} checked={pickOf(design) === 'like'} class="sr-only" />
+                    <Icon name="like" class="h-5 w-5" /> Like
+                  </label>
+                  <label class="choice choice-dislike">
+                    <input type="radio" name={`pick:${design.position}`} value="dislike" id={`dislike-${design.position}`} checked={pickOf(design) === 'dislike'} class="sr-only" />
+                    <Icon name="dislike" class="h-5 w-5" /> Dislike
+                  </label>
+                </div>
+              </div>
+            )}
+
+            {/*
+              The rest of the side bar folds: the client's notes on this design (what they like, what they
+              dislike), and what we wrote about it.
+              One is open at a time (they share a `name`), so the column never runs long.
+            */}
+            <div class="design-more">
+              {!sent && (
+                <details class="more-panel" name={`more-${design.position}`} open>
+                  <summary class="more-summary">
+                    <span class="more-title"><Icon name="notes" class="more-icon" /> Your notes <span class="more-added">Added</span></span>
+                    <Icon name="down" class="more-chevron h-5 w-5" />
+                  </summary>
+                  <div class="more-body">
+                    <p class="text-sm leading-relaxed text-slate-600">The more you tell us, the better we can design the right website for you.</p>
+                    {/* Two boxes, because one design can have both: things to keep and things to change. */}
+                    <label for={`likes-${design.position}`} class="note-label"><Icon name="like" class="h-4 w-4 text-teal-ink" /> What do you like?</label>
+                    <textarea id={`likes-${design.position}`} name={`likes:${design.position}`} rows="3" maxlength="1000" placeholder="The colours, the layout, the photos…" class="field mt-2">{likesOf(design)}</textarea>
+                    <label for={`dislikes-${design.position}`} class="note-label"><Icon name="dislike" class="h-4 w-4 text-slate-500" /> What do you dislike?</label>
+                    <textarea id={`dislikes-${design.position}`} name={`dislikes:${design.position}`} rows="3" maxlength="1000" placeholder="Anything you'd change or leave out…" class="field mt-2">{dislikesOf(design)}</textarea>
+                  </div>
+                </details>
+              )}
+              {design.notes && (
+                <details class="more-panel" name={`more-${design.position}`} open={sent}>
+                  <summary class="more-summary">
+                    <span class="more-title"><Icon name="info" class="more-icon" /> About this design</span>
+                    <Icon name="down" class="more-chevron h-5 w-5" />
+                  </summary>
+                  <div class="more-body">
+                    <p class="leading-relaxed">{design.notes}</p>
+                  </div>
+                </details>
+              )}
+            </div>
+
+            {/* The way on. Closing the panel is the way back to all five, so there is no button for that. */}
+            <div class="design-next">
+              {after(i) ? (
+                <a href={`#design-${after(i)!.position}`} class="btn-primary">Next design <Icon name="arrow" /></a>
+              ) : (
+                <a href="#designs" class="btn-primary">Done <Icon name="arrow" /></a>
+              )}
+            </div>
+          </div>
+        </div>
+      </section>
+    ))
+  }
+
+  {/* The way on. The button only appears once there is something to review: at least one Like. */}
+  <div class="designs-foot">
+    {
+      sent ? (
+        <>
+          {ranking.notes && (
+            <div class="mx-auto max-w-xl text-left">
+              <h2 class="text-base font-bold">Your notes</h2>
+              <p class="mt-1 leading-relaxed whitespace-pre-line">{ranking.notes}</p>
+            </div>
+          )}
+        </>
+      ) : (
+        <>
+          <p class="review-hint">Like at least one design to carry on.</p>
+          <button type="submit" name="do" value="review" class="btn-primary review-button">Review my choices <Icon name="arrow" /></button>
+        </>
+      )
+    }
+  </div>
+</form>
+
+<script>
+  // Keys and focus for an opened design, and a mouse drag for the row of cards. Everything still works without this.
+  const opened = (): HTMLElement | null => (location.hash.startsWith('#design-') ? document.querySelector<HTMLElement>('.design-detail:target') : null);
+
+  addEventListener('keydown', (event) => {
+    const detail = opened();
+    if (!detail) return;
+    const typing = event.target instanceof HTMLTextAreaElement || event.target instanceof HTMLInputElement;
+    if (event.key === 'Escape') location.hash = 'designs';
+    else if (!typing && event.key === 'ArrowRight') detail.querySelector<HTMLAnchorElement>('[data-next]')?.click();
+    else if (!typing && event.key === 'ArrowLeft') detail.querySelector<HTMLAnchorElement>('[data-prev]')?.click();
+  });
+
+  // Focus goes into a design when it opens, and back to its card when it closes.
+  let last = '';
+  const follow = (): void => {
+    const detail = opened();
+    if (detail) {
+      last = location.hash;
+      detail.querySelector<HTMLElement>('[data-close]')?.focus({ preventScroll: true });
+    } else if (last) {
+      document.querySelector<HTMLElement>(`.design-card[href="${last}"]`)?.focus({ preventScroll: true });
+      last = '';
+    }
+  };
+  addEventListener('hashchange', follow);
+  follow();
+
+  // After Like or Dislike, the matching notes box comes to hand: "What do you like?" after a Like,
+  // "What do you dislike?" after a Dislike. With a mouse the cursor goes straight into it. On a touch
+  // screen it is scrolled into view instead, so the keyboard doesn't leap up unasked.
+  for (const choice of document.querySelectorAll<HTMLInputElement>('.choice input')) {
+    choice.addEventListener('change', () => {
+      const box = choice.closest('.design-body')?.querySelector<HTMLTextAreaElement>(`textarea[name^="${choice.value}s:"]`);
+      if (!box) return;
+      // If "About this design" was open, the notes panel takes its place.
+      const panel = box.closest('details');
+      if (panel) panel.open = true;
+      if (matchMedia('(pointer: fine)').matches) box.focus({ preventScroll: true });
+      else box.scrollIntoView({ block: 'center', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+    });
+  }
+
+  // On a narrow screen the cards are a row that scrolls sideways. Touch swipes it; this lets a mouse
+  // drag it too. A drag is not a click, so the card under the pointer does not open.
+  const fan = document.querySelector<HTMLElement>('.design-fan');
+  if (fan) {
+    let from: { x: number; left: number } | null = null;
+    let dragged = false;
+    fan.addEventListener('pointerdown', (event) => {
+      if (event.pointerType !== 'mouse' || event.button !== 0 || fan.scrollWidth <= fan.clientWidth) return;
+      from = { x: event.clientX, left: fan.scrollLeft };
+      dragged = false;
+    });
+    addEventListener('pointermove', (event) => {
+      if (!from) return;
+      const moved = event.clientX - from.x;
+      if (!dragged && Math.abs(moved) < 6) return;
+      dragged = true;
+      fan.classList.add('is-dragging');
+      fan.scrollLeft = from.left - moved;
+    });
+    addEventListener('pointerup', () => {
+      from = null;
+      // Let the click that follows a drag be swallowed (below) before the row settles again.
+      setTimeout(() => fan.classList.remove('is-dragging'), 0);
+    });
+    fan.addEventListener(
+      'click',
+      (event) => {
+        if (dragged) {
+          event.preventDefault();
+          dragged = false;
+        }
+      },
+      true,
+    );
+    fan.addEventListener('dragstart', (event) => event.preventDefault());
+  }
+</script>

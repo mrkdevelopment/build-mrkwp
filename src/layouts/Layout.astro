@@ -10,8 +10,10 @@ interface Props {
   progress?: { steps: string[]; done: number };
   /** Reload the page by itself after this many seconds (the "checking your website" screen). */
   refresh?: number;
+  /** Use the full width of a large screen, for a screen that lays things out side by side. */
+  wide?: boolean;
 }
-const { title, jobNumber, progress, refresh } = Astro.props;
+const { title, jobNumber, progress, refresh, wide = false } = Astro.props;
 ---
 
 <!doctype html>
@@ -37,9 +39,9 @@ const { title, jobNumber, progress, refresh } = Astro.props;
         {jobNumber && <span class="text-sm font-semibold text-slate-600">Job <span class="font-mono text-navy">{jobNumber}</span></span>}
       </div>
     </header>
-    <main class="mx-auto max-w-6xl px-4 pb-16 sm:px-6 lg:px-8">
+    <main class:list={['mx-auto px-4 pb-16 sm:px-6 lg:px-8', wide ? 'max-w-[88rem]' : 'max-w-6xl']}>
       {progress && <ProgressStrip {...progress} />}
-      <div class="mx-auto mt-8 max-w-xl sm:mt-12">
+      <div class:list={['mx-auto', wide ? 'mt-6 sm:mt-8' : 'mt-8 max-w-xl sm:mt-12']}>
         <slot />
       </div>
     </main>
